@@ -1,0 +1,309 @@
+# Sprint Plan — Daisy Flower
+
+**SDLC Version**: 6.1.0  
+**Stage**: 04 - BUILD  
+**Status**: Active
+
+---
+
+## 1. Tổng quan
+
+Dự án đang ở giai đoạn **BUILD**: codebase Payload + Next.js đã có Pages, Categories, Products (ecommerce plugin), SaleEvents, Media, Users; frontend có trang chủ (blocks), shop (listing, filter, search), chi tiết sản phẩm, giỏ hàng và tích hợp Stripe. Sprint plan dùng để **đồng bộ tiến độ** và **định hướng công việc tiếp theo**; có mapping file/component và convention để dev/AI agent tham chiếu nhanh.
+
+**Giám sát tiến độ theo feature**: Dùng [project-progress.md](project-progress.md) để xem feature nào đã xong, đang làm, chưa làm và **cần handle gì tiếp theo**. Cập nhật file đó khi hoàn thành hoặc bắt đầu feature.
+
+**Skills cho agent**: Khi sửa Payload (collections, hooks, access, API) hoặc layout/responsive (blocks, trang), dùng skill tương ứng — xem [agent-skills.md](agent-skills.md).
+
+---
+
+## 2. Sprint hiện tại — Củng cố MVP & trải nghiệm
+
+**Mục tiêu**: Hoàn thiện luồng mua hàng (shop → product → cart → checkout), ổn định sale events và tìm kiếm/lọc; sẵn sàng soft launch cho shop hoa.
+
+### 2.1 Nhóm công việc & mapping file
+
+#### Layout & navigation (Header, Cart)
+
+| Task | File / vị trí chính | Ghi chú |
+|------|----------------------|--------|
+| Header (top bar, middle logo/search/cart, categories bar) | `src/components/Header/index.client.tsx` | Top bar: topBarContent, language/theme dropdowns (md+). Middle: MobileMenu (mobile), logo, Search (desktop), User/Wishlist/Cart. Categories bar: sticky, dropdown + nav links + phone. |
+| MobileMenu (Sheet trái) | `src/components/Header/MobileMenu.tsx` | Nav từ global, My account (Orders, Addresses, Manage account, Log out / Login, Create account), Theme switcher; đóng khi resize > md hoặc pathname/searchParams đổi. |
+| Cart trigger + drawer | `src/components/Cart/`, `OpenCart.tsx` | OpenCartButton: icon + badge số lượng; Cart dùng renderTrigger, hiển thị subtotal trên xl. |
+
+#### Shop & catalog
+
+| Task | File / vị trí chính | Ghi chú |
+|------|----------------------|--------|
+| Listing, filter category, search `q` | `src/app/(app)/shop/page.tsx` | `payload.find` với `where` (category, or title/description like). |
+| Layout shop (sidebar categories) | `src/app/(app)/shop/layout.tsx` | Lấy categories server-side, truyền xuống sidebar. |
+| ProductCard (ảnh, tên, giá, link) | `src/components/product/ProductCard.tsx` | Ảnh: `product.meta?.image` hoặc `product.gallery?.[0]?.image`. |
+| Search (header, debounce, chỉ trên /shop) | `src/components/layout/search/Search.tsx` | Debounce 500ms; `pathname.startsWith('/shop')` mới auto redirect/search. |
+| Chi tiết sản phẩm | `src/app/(app)/products/[slug]/page.tsx` | Fetch by slug; hiển thị gallery, mô tả, giá, sale, thêm giỏ. |
+| Wishlist | `src/collections/Wishlist.ts`, `useWishlist`, `/wishlist`, Header icon + badge, ProductCard | Collection (user + product); provider Wishlist; trang /wishlist; thêm/xóa từ ProductCard. |
+
+#### Sale & khuyến mãi
+
+| Task | File / vị trí | Ghi chú |
+|------|----------------|--------|
+| Job refresh sale events | `src/jobs/saleEvents.ts` | Task `refresh-sale-events`; cron `*/2 * * * *`; chỉ update doc cần đổi status. |
+| Block SaleOffer (countdown, giá sale) | `src/blocks/SaleOffer/` | Component.tsx (server) lấy active event; Component.client.tsx countdown; khi hết hạn hiển thị giá gốc. |
+| Hiển thị giá sale trên ProductCard / product page | `ProductCard`, product detail | Dữ liệu sale từ product.saleEvents hoặc query active event theo product + time. |
+
+#### Cart & checkout
+
+| Task | File / vị trí | Ghi chú |
+|------|----------------|--------|
+| Giỏ hàng, cập nhật / xóa item | Plugin ecommerce + components checkout | Cart state/API do plugin cung cấp. |
+| Trang checkout, Stripe Elements | `src/app/(app)/checkout/page.tsx`, `src/components/checkout/CheckoutPage.tsx` | Load Stripe, Elements wrapper; cần `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`. |
+| Form thanh toán, confirmPayment | `src/components/forms/CheckoutForm/index.tsx` | useStripe, confirmPayment, sau đó confirmOrder('stripe', ...). |
+| Xác nhận đơn | `src/app/(app)/checkout/confirm-order/page.tsx`, `ConfirmOrder.tsx` | Hiển thị kết quả sau thanh toán. |
+| Webhook Stripe | Plugin ecommerce (Payload route) | URL: `/api/payments/stripe/webhooks`; cần `STRIPE_WEBHOOKS_SIGNING_SECRET`. |
+
+#### Admin & nội dung
+
+| Task | File / vị trí | Ghi chú |
+|------|----------------|--------|
+| Categories CRUD | `src/collections/Categories.ts` | Access: read public, write adminOnly. |
+| Products (override) | `src/collections/Products/index.ts` | Join saleEvents; categories; gallery; meta SEO. |
+| Sale events | `src/collections/SaleEvents.ts` | Admin hidden; tạo từ product (join) hoặc trực tiếp. |
+| Pages, blocks | `src/collections/Pages/index.ts` | Layout: hero + blocks (ProductListing, SaleOffer, ShopByCategories, ...). |
+| Render block theo type | `src/app/(app)/[slug]/page.tsx` (hoặc layout) | Map blockType → component tương ứng. |
+
+#### Kỹ thuật & chất lượng
+
+| Task | Ghi chú |
+|------|--------|
+| `pnpm generate:types` | Chạy sau mỗi lần sửa schema (collections, globals). |
+| `pnpm generate:importmap` | Chạy sau khi tạo/sửa component dùng trong admin (AGENTS.md). |
+| Access control | Khi gọi Local API với `user` thì đặt `overrideAccess: false`; hooks luôn truyền `req` cho nested operations. |
+| Security | Đọc `.cursor/rules/security-critical.mdc` hoặc AGENTS.md; không hardcode secret. |
+
+#### Voucher & User Levels — Sprint Tracking
+
+*Chi tiết yêu cầu và thiết kế: [01-planning § US8, US9](01-planning/requirements.md), [02-design § 11](02-design/architecture-decisions.md#11-voucher--user-levels).*
+
+##### Sprint 1 — Data Model & Admin (Xong)
+
+| Task | File | Trạng thái |
+|------|------|------------|
+| Collection Vouchers (code, type, value, scope, assignMode, date range, usage limits, drafts) | `src/collections/Vouchers.ts` | **Xong** |
+| Auto-gen voucher code + beforeValidate (normalize, clamp %, strict validation skip draft) | `src/collections/Vouchers.ts` hooks | **Xong** |
+| Đăng ký Vouchers vào config | `src/payload.config.ts` | **Xong** |
+| Global UserLevelSettings (levels array: level, minSpending, discountPercent, freeShipping) | `src/globals/UserLevelSettings.ts` | **Xong** |
+| Duplicate level prevention (beforeValidate) | `src/globals/UserLevelSettings.ts` hooks | **Xong** |
+| recalculateUserLevels hook (afterChange on global → re-eval all users) | `src/globals/hooks/recalculateUserLevels.ts` | **Xong** |
+| Users: level, levelLocked, totalSpent fields (sidebar, admin-only update) | `src/collections/Users/index.ts` | **Xong** |
+| USER_LEVELS constants (avoid circular dep) | `src/config/userLevels.ts` | **Xong** |
+
+##### Sprint 2 — Business Logic (Xong)
+
+| Task | File | Trạng thái |
+|------|------|------------|
+| Orders override: voucher (rel), voucherCode (snapshot), discountAmount, levelDiscount | `src/plugins/index.ts` ordersCollectionOverride | **Xong** |
+| Carts override: appliedVoucher, voucherCode, originalSubtotal, voucherDiscount, levelDiscount | `src/plugins/index.ts` cartsCollectionOverride | **Xong** |
+| applyCartDiscounts hook (re-validate voucher, calc level discount, adjust subtotal) | `src/hooks/carts/applyCartDiscounts.ts` | **Xong** |
+| copyVoucherToOrder hook (copy discount metadata from cart to order on creation) | `src/hooks/orders/copyVoucherToOrder.ts` | **Xong** |
+| syncUserOnOrderChange hook (totalSpent recalc + level upgrade/downgrade on order complete/refund) | `src/hooks/orders/syncUserOnOrderChange.ts` | **Xong** |
+| incrementVoucherUsage hook (usedCount++ on create, usedCount-- on cancel/refund from any active status) | `src/hooks/orders/incrementVoucherUsage.ts` | **Xong** |
+| Voucher validate endpoint `POST /api/vouchers/validate` (auth, dates, limits, assignMode, minOrder, scope, discount calc) | `src/endpoints/validateVoucher.ts` | **Xong** |
+| Apply voucher to cart endpoint `POST /api/vouchers/apply-to-cart` | `src/endpoints/applyVoucherToCart.ts` | **Xong** |
+| Remove voucher from cart endpoint `POST /api/vouchers/remove-from-cart` | `src/endpoints/removeVoucherFromCart.ts` | **Xong** |
+| Integration test suite (33 tests, seed data, full workflow coverage) | `tests/int/voucher-system.int.spec.ts` | **Xong** |
+| Register hooks + endpoints in config | `src/plugins/index.ts`, `src/payload.config.ts` | **Xong** |
+
+##### Sprint 3 — Frontend UI (Đang làm)
+
+| Task | File / vị trí dự kiến | Trạng thái |
+|------|------------------------|------------|
+| Checkout: VoucherInput (nhập mã, nút áp dụng, hiển thị discount) | `src/components/checkout/VoucherInput.tsx` | **Xong** |
+| Checkout: Price breakdown (subtotal, voucher discount, level discount, total) | `src/components/checkout/PriceBreakdown.tsx` | **Xong** |
+| Account: Level display (level hiện tại + ưu đãi) | `src/components/account/UserLevelCard.tsx` | **Xong** |
+| Pass voucher + levelDiscount to order creation flow | `copyVoucherToOrder` hook (existing) | **Xong** (hook đã handle) |
+
+##### Stacking Rules
+
+- **Sale price + Voucher**: Voucher tính trên giá đã sale (không trên giá gốc).
+- **Level discount + Voucher**: Level discount và voucher discount đều stack, áp dụng lên giá đã sale.
+- **Voucher scope `specific`**: Chỉ áp dụng discount lên sản phẩm được chọn, không phải toàn bộ order.
+
+##### levelLocked Behavior
+
+- `levelLocked = true` → chỉ ngăn auto-downgrade, cho phép auto-upgrade (lock giữ nguyên khi upgrade — admin intent = floor).
+- Admin có thể set level + lock thủ công cho user VIP/compensation.
+
+##### Tax (US10) — Sprint Tracking (core đã implement)
+
+*Thiết kế và solution chi tiết: [tax-feature-solution.md](tax-feature-solution.md).*
+
+| Sprint | Task | File / vị trí | Trạng thái |
+|--------|------|----------------|------------|
+| 1 | Global TaxSettings (taxMode, defaultTaxClasses) | `src/globals/TaxSettings.ts` | **Xong** |
+| 1 | Carts override: taxAmount, taxRates | `src/plugins/index.ts` | **Xong** |
+| 1 | Orders override: taxAmount, taxRates | `src/plugins/index.ts` | **Xong** |
+| 2 | applyCartDiscounts: logic tính thuế cuối hook | `src/hooks/carts/applyCartDiscounts.ts` | **Xong** |
+| 2 | copyVoucherToOrder: copy taxAmount, taxRates | `src/hooks/orders/copyVoucherToOrder.ts` | **Xong** |
+| 2 | Verify Stripe amount = subtotal + tax | Plugin / adapter | **Chưa làm** |
+| 3 | PriceBreakdown: dòng VAT + Total | `src/components/checkout/PriceBreakdown.tsx` | **Xong** |
+| 3 | CheckoutPage: truyền tax xuống PriceBreakdown | `CheckoutPage.tsx` | **Xong** |
+| 3 | CartModal: Total = subtotal + taxAmount | `CartModal.tsx` | **Chưa làm** |
+| 4 | Test + docs (tests tự động cho thuế, review lại docs khi hoàn tất) | — | **Chưa làm** |
+
+**Lưu ý**: Khi làm việc với Stripe/payment, cần verify plugin ecommerce dùng cart total như thế nào — xem [tax-feature-solution § 4](tax-feature-solution.md#4-phụ-thuộc-plugin-ecommerce).
+
+##### Bundle products / Bó hoa (Composite Products) — Sprint Planning (chưa implement)
+
+*Thiết kế & solution chi tiết: [bundle-feature-solution.md](bundle-feature-solution.md).*
+
+| Sprint | Task | File / vị trí | Trạng thái |
+|--------|------|----------------|------------|
+| 1 | Products: `productKind` (`simple` \| `bundle`) + `bundleItems` (BOM) | `src/collections/Products/index.ts` | **Chưa làm** |
+| 1 | Admin UI: tab/section cấu hình bó hoa, quản lý `inventory` bundle (pre-allocated) | `src/collections/Products/index.ts` (admin config) | **Chưa làm** |
+| 2 | Cart logic: expand bundle thành nhiều `CartItem` con, gắn metadata bundling | Hook/endpoint Add to Cart, `carts` hooks | **Chưa làm** |
+| 2 | Orders: hook trừ tồn kho bundle (không trừ child trong checkout) | `src/hooks/orders/*` (hook mới hoặc mở rộng) | **Chưa làm** |
+| 3 | Frontend product page: hiển thị thành phần bó hoa + tồn kho bundle | `src/app/(app)/products/[slug]/page.tsx` | **Chưa làm** |
+| 3 | Cart/Checkout UI: group các dòng con theo bó hoa, chỉnh quantity ở cấp bundle | `src/components/Cart/*`, `src/components/checkout/*` | **Chưa làm** |
+| 4 | Tests & docs cho bundle (inventory, thuế, UI) | `tests/*`, `docs/02-design`, `docs/04-build`, `docs/guides` | **Chưa làm** |
+| 4 (Optional) | Goods receipts & stock movement logs (nhập kho + lịch sử dịch chuyển) | `docs/04-build/bundle-feature-solution.md`, collection mới (sau này) | **Chưa làm** |
+
+##### US10.1 — Thuế theo sản phẩm/danh mục (chưa implement)
+
+*Phụ thuộc US10. Chi tiết: [tax-feature-solution § 8](tax-feature-solution.md#8-us101--thuế-theo-sản-phẩm--danh-mục).*
+
+| Task | File | Trạng thái |
+|------|------|------------|
+| Product: taxExempt, taxRateOverride | `src/collections/Products/index.ts` | **Chưa làm** |
+| Category: taxRateOverride | `src/collections/Categories.ts` | **Chưa làm** |
+| applyCartDiscounts: tính thuế theo item | `src/hooks/carts/applyCartDiscounts.ts` | **Chưa làm** |
+
+##### Shipping Fee — Sprint Planning (chưa implement)
+
+*Thiết kế và solution chi tiết: [shipping-feature-solution.md](shipping-feature-solution.md).*
+
+| Sprint | Task | File / vị trí | Trạng thái |
+|--------|------|----------------|------------|
+| 1 | Global ShippingSettings (defaultFee, threshold) | `src/globals/ShippingSettings.ts` | **Chưa làm** |
+| 1 | Carts & Orders override: shippingFee | `src/plugins/index.ts` | **Chưa làm** |
+| 2 | applyCartDiscounts: tính toán & phân bổ phí ship | `src/hooks/carts/applyCartDiscounts.ts` | **Chưa làm** |
+| 2 | copyVoucherToOrder: copy shippingFee | `src/hooks/orders/copyVoucherToOrder.ts` | **Chưa làm** |
+| 3 | Checkout UI: Cập nhật dòng Shipping vào PriceBreakdown, CartModal, Orders history | Components Checkout/Cart | **Chưa làm** |
+
+##### Bug Fixes Applied (Sprint 2 QA)
+
+| # | Severity | Issue | Fix |
+|---|----------|-------|-----|
+| 1 | Critical | Cancel order từ `processing` không giảm `usedCount` | Decrement khi chuyển từ bất kỳ active → cancelled/refunded |
+| 2 | High | `scope: 'specific'` discount toàn bộ cart | Tính `discountBase` từ eligible items only |
+| 3 | Medium | `minOrderAmount` không re-check khi cart thay đổi | Thêm `meetsMinOrder` trong re-validation |
+| 4 | Medium | `parseInt` vs `String` ID comparison | Thống nhất `String()` |
+| 5 | Medium | `orderSubtotal` có thể âm | `Math.max(0, orderSubtotal)` |
+| 6 | Medium | Admin tạo order → lấy nhầm admin's cart | Chỉ dùng `data.customer`, không fallback `req.user` |
+| 7 | Low | `levelLocked` bị xóa khi upgrade | Giữ nguyên lock khi upgrade |
+| 8 | Low | Tổng discount có thể vượt subtotal | Cap tổng discount tại `baseSubtotal` |
+
+---
+
+## 3. Convention & patterns (ghi chú build)
+
+### 3.1 Search
+
+- **Chỉ chạy auto-search** khi `pathname.startsWith('/shop')` để tránh redirect từ trang chủ về shop khi user đang ở `/`.
+
+### 3.2 Product image
+
+- Payload shape: gallery item có `.image` (relation to media). Dùng `product.meta?.image` hoặc `product.gallery?.[0]?.image` cho ảnh đại diện.
+
+### 3.3 Sale event
+
+- Lấy event **active** theo product + khoảng thời gian (startsAt, endsAt) qua Local API.
+- Job **chỉ cập nhật** document có status thực sự cần đổi (expired: endsAt < now; active: now trong [startsAt, endsAt]) để giảm ghi DB.
+
+### 3.4 Naming
+
+- File: **kebab-case** (ví dụ `sale-events.ts` cho slug; tên file config có thể PascalCase trong blocks).
+- Collection slug: **kebab-case** (e.g. `sale-events`, `products` từ plugin).
+
+### 3.5 Block mới
+
+- Thêm config trong `src/blocks/<BlockName>/config.ts`.
+- Đăng ký trong `src/collections/Pages/index.ts` (layout.blocks).
+- Component (Server hoặc Client) đặt trong block folder; nếu dùng hook/client thì `Component.client.tsx`.
+- Chạy `generate:importmap` nếu block dùng trong admin.
+
+---
+
+## 4. Definition of Done (cho từng task)
+
+- Code chạy đúng trên môi trường dev (`pnpm dev`).
+- Không hardcode secret; biến nhạy cảm dùng env (xem `docs/03-integrate/env-vars.md`).
+- Thay đổi collection/global có access control thì đảm bảo role/access đã cấu hình và test.
+- Nếu sửa schema: đã chạy `generate:types` (và `generate:importmap` nếu liên quan admin components).
+
+---
+
+## 5. Sprint tiếp theo (định hướng)
+
+- **US10 Tax**: 4 sprint theo [tax-feature-solution.md](tax-feature-solution.md) — TaxSettings, cart/order fields, applyCartDiscounts, PriceBreakdown, CartModal.
+- **Shipping Fee**: Config, tính toán giỏ hàng, cập nhật UI checkout theo [shipping-feature-solution.md](shipping-feature-solution.md).
+- **Soft launch**: Deploy (Vercel hoặc host khác), cấu hình domain, SSL, env production.
+- **Nội dung**: Seed hoặc nhập sản phẩm/danh mục thật; tạo 1–2 sale events mẫu; tạo voucher mẫu.
+- **Monitoring**: Log lỗi, health check cơ bản (tùy chọn).
+- **Nice-to-have**: Wishlist, coupon nâng cao, SEO (meta, sitemap) theo requirements.
+
+---
+
+## 6. Troubleshooting (thường gặp)
+
+| Triệu chứng | Nguyên nhân có thể | Cách xử lý |
+|-------------|--------------------|------------|
+| Shop redirect về /shop khi gõ ở trang chủ | Search effect chạy khi pathname chưa phải /shop | Giới hạn effect: `pathname.startsWith('/shop')` (đã áp trong Search). |
+| Ảnh sản phẩm không hiện | Sai path ảnh (gallery vs meta) | Dùng `product.gallery?.[0]?.image` hoặc `product.meta?.image` (object media có url). |
+| Sale giá không đổi sau khi hết hạn | Job chưa chạy hoặc cron sai | Kiểm tra `payload.config.ts` tasks + jobs.autoRun; xem log job. |
+| Button is not defined (ProductListing) | Thiếu import Button | Import từ `@/components/ui/button` (đã sửa trong codebase). |
+| Type lỗi sau khi sửa collection | Chưa generate types | Chạy `pnpm generate:types`. |
+| Checkout không load Stripe | Thiếu env Stripe | Đặt `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (và secret cho server). |
+
+---
+
+## 7. Gate G3 (Ship Ready) — Checklist trước khi deploy
+
+- [ ] Các user story MVP thao tác được trên staging.
+- [ ] Không lộ secret; access control đã kiểm tra.
+- [ ] Job sale events chạy đúng theo lịch (cron).
+- [ ] Thanh toán test (Stripe test mode) thành công end-to-end.
+- [ ] README hoặc docs deploy có hướng dẫn env và chạy lần đầu (có thể dùng `docs/03-integrate/env-vars.md`).
+
+---
+
+## 8. Seed & Homepage layout
+
+**Bám sát kiến trúc đã setup**: Các trang build động từ Payload; homepage = page `slug: 'home'`. Bố cục layout (hero + thứ tự blocks) định nghĩa trong seed.
+
+### Seed files tham chiếu
+
+| File | Mục đích |
+|------|----------|
+| `src/endpoints/seed/index.ts` | Entry: reset DB, tạo media, categories, products, variant types/options, **pages** (home + contact), addresses, transactions, …; gọi `homePageData()` khi tạo page home. |
+| `src/endpoints/seed/home.ts` | **`homePageData({ metaImage, heroImages, categories, product, blogImages })`** — trả về document page cho `slug: 'home'`: hero (highImpact, 3 slides), **layout[]** (thứ tự blocks). |
+| `src/endpoints/seed/home-static.ts` | **`homeStaticData()`** — fallback khi chưa seed: page home tối giản (hero lowImpact + richText). |
+| `src/endpoints/seed/contact-page.ts` | Dữ liệu page Contact (form, layout). |
+
+### Thứ tự layout homepage (từ `home.ts`)
+
+1. **Shop By Categories** — chỉ thêm khi có categories; title, description, exploreMoreLink, categories.
+2. **Limited Time Offer** (saleOffer) — sectionTitle, highlight, product (sản phẩm sale).
+3. **Homepage Product Listing** (productListing) — Featured Products, tabs: All, Bouquets, Indoor Plants, Outdoor Plants, Dried Flowers.
+4. **From the Blog** (blogBento) — 6 items (kicker, title, excerpt, image, link).
+5. **Content Block** (content) — Core features + 5 cột oneThird.
+6. **Media Block** (mediaBlock) — 1 ảnh.
+
+### Render động
+
+- **`src/app/(app)/page.tsx`** → re-export **`[slug]/page.tsx`** (slug mặc định `'home'`).
+- **`src/app/(app)/[slug]/page.tsx`** → `queryPageBySlug(slug)`; nếu `!page && slug === 'home'` dùng `homeStaticData()`; render `<RenderHero {...hero} />` + `<RenderBlocks blocks={layout} />`.
+- **`src/blocks/RenderBlocks.tsx`** — map `blockType` → component; mỗi block nhận props từ `layout[i]`.
+
+Chỉnh bố cục homepage: Admin → Pages → Home (sửa layout blocks) hoặc sửa `home.ts` rồi chạy lại seed.
+
+---
+
+*Tài liệu build — Daisy Flower. SDLC 6.1.0, Stage 04.*

@@ -1,0 +1,707 @@
+'use client'
+
+import { Media } from '@/components/Media'
+import { Message } from '@/components/Message'
+import { Price } from '@/components/Price'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useAuth } from '@/providers/Auth'
+import { useTheme } from '@/providers/Theme'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import React, { Suspense, useCallback, useEffect, useState } from 'react'
+
+import { AddressItem } from '@/components/addresses/AddressItem'
+import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
+import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
+import { PriceBreakdown } from '@/components/checkout/PriceBreakdown'
+import { VoucherInput } from '@/components/checkout/VoucherInput'
+import { CheckoutForm } from '@/components/forms/CheckoutForm'
+import { FormItem } from '@/components/forms/FormItem'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cssVariables } from '@/cssVariables'
+import { Address, Cart } from '@/payload-types'
+import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
+import { toast } from 'sonner'
+
+const apiKey = `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}`
+const stripe = loadStripe(apiKey)
+
+type LevelInfo = {
+  name: string
+  discountPercent: number
+}
+
+type CheckoutPageProps = {
+  salePrices?: Record<string, number>
+  levels?: Array<{ level: string; discountPercent: number }>
+  taxMode?: string
+}
+
+export const CheckoutPage: React.FC<CheckoutPageProps> = ({
+  salePrices = {},
+  levels = [],
+  taxMode = 'exclusive',
+}) => {
+  const { user } = useAuth()
+  const router = useRouter()
+  const { cart } = useCart()
+  const [error, setError] = useState<null | string>(null)
+  const { theme } = useTheme()
+  /**
+   * State to manage the email input for guest checkout.
+   */
+  const [email, setEmail] = useState('')
+  const [emailEditable, setEmailEditable] = useState(true)
+  const [paymentData, setPaymentData] = useState<null | Record<string, unknown>>(null)
+  const { initiatePayment } = usePayments()
+  const { addresses: rawAddresses } = useAddresses()
+
+  const addresses = React.useMemo(() => {
+    if (!rawAddresses || !user) return []
+    return rawAddresses.filter((address) => {
+      const customerId =
+        typeof address.customer === 'object' ? address.customer?.id : address.customer
+      return customerId === user.id
+    })
+  }, [rawAddresses, user])
+
+  const [shippingAddress, setShippingAddress] = useState<Partial<Address>>()
+  const [billingAddress, setBillingAddress] = useState<Partial<Address>>()
+  const [billingAddressSameAsShipping, setBillingAddressSameAsShipping] = useState(true)
+  const [isProcessingPayment, setProcessingPayment] = useState(false)
+
+  // --- Discount state ---
+  const [voucherCode, setVoucherCode] = useState<string | null>(null)
+  const [voucherDiscount, setVoucherDiscount] = useState(0)
+  const [levelDiscount, setLevelDiscount] = useState(0)
+  const [originalSubtotal, setOriginalSubtotal] = useState(0)
+  const [taxAmount, setTaxAmount] = useState(0)
+  const [taxRates, setTaxRates] = useState<Array<{ name: string; rate: number; amount: number }>>(
+    [],
+  )
+
+  const cartIsEmpty = !cart || !cart.items || !cart.items.length
+
+  const canGoToPayment = Boolean(
+    (email || user) && billingAddress && (billingAddressSameAsShipping || shippingAddress),
+  )
+
+  const userLevel = user?.level || 'bronze'
+
+  const levelInfo = React.useMemo<LevelInfo | null>(() => {
+    const match = levels.find((l) => l.level === userLevel)
+    if (match && match.discountPercent > 0) {
+      return {
+        name: userLevel.charAt(0).toUpperCase() + userLevel.slice(1),
+        discountPercent: match.discountPercent,
+      }
+    }
+    return null
+  }, [levels, userLevel])
+
+  // Fetch cart discount data on mount and whenever items change (logged-in users only)
+  // This ensures that if a product removal voids a voucher, the UI reflects it immediately.
+  useEffect(() => {
+    if (!user) return
+
+    const touchCart = async () => {
+      try {
+        let cartId = (cart as Cart)?.id
+
+        // Fallback: If cart.id is missing, fetch it
+        if (!cartId) {
+          const cartListRes = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/carts?where[customer][equals]=${user.id}&where[purchasedAt][exists]=false&sort=-updatedAt&limit=1&depth=0&select[id]=true`,
+            { credentials: 'include' },
+          )
+
+          if (!cartListRes.ok) return
+
+          const cartListData = await cartListRes.json()
+          cartId = cartListData?.docs?.[0]?.id
+        }
+
+        if (!cartId) return
+
+        // "Touch" cart via PATCH (triggers beforeChange hooks for sale price and voucher recalc)
+        const patchRes = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/carts/${cartId}`, {
+          method: 'PATCH',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        })
+
+        if (patchRes.ok) {
+          const patchData = await patchRes.json()
+          const activeCart = patchData?.doc as Cart
+          if (activeCart) {
+            setVoucherCode(activeCart.voucherCode || null)
+            setVoucherDiscount(activeCart.voucherDiscount || 0)
+            setLevelDiscount(activeCart.levelDiscount || 0)
+            setOriginalSubtotal(activeCart.originalSubtotal || activeCart.subtotal || 0)
+            setTaxAmount((activeCart.taxAmount as number) || 0)
+            setTaxRates(
+              (activeCart.taxRates as Array<{ name: string; rate: number; amount: number }>) || [],
+            )
+          }
+        }
+      } catch {
+        // Silently fail — discount display is non-critical
+      }
+    }
+
+    void touchCart()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, JSON.stringify(cart?.items || [])])
+
+  // Local state is synced with cart via touchCart() and handleVoucher APIs.
+  // The default `useCart()` from Payload does not return custom fields like originalSubtotal,
+  // so we must avoid blindly overriding local state with cart mutations lacking full context.
+
+  // On initial load wait for addresses to be loaded and check to see if we can prefill a default one
+  useEffect(() => {
+    if (!shippingAddress) {
+      if (addresses && addresses.length > 0) {
+        const defaultAddress = addresses[0]
+        if (defaultAddress) {
+          setBillingAddress(defaultAddress)
+        }
+      }
+    }
+  }, [addresses, shippingAddress])
+
+  useEffect(() => {
+    return () => {
+      setShippingAddress(undefined)
+      setBillingAddress(undefined)
+      setBillingAddressSameAsShipping(true)
+      setEmail('')
+      setEmailEditable(true)
+    }
+  }, [])
+
+  const handleVoucherApplied = useCallback((data: Record<string, unknown>) => {
+    setVoucherCode((data.voucherCode as string) || null)
+    setVoucherDiscount((data.voucherDiscount as number) || 0)
+    setLevelDiscount((data.levelDiscount as number) || 0)
+    setOriginalSubtotal((data.originalSubtotal as number) || 0)
+    setTaxAmount((data.taxAmount as number) || 0)
+    setTaxRates((data.taxRates as Array<{ name: string; rate: number; amount: number }>) || [])
+  }, [])
+
+  const handleVoucherRemoved = useCallback((data: Record<string, unknown>) => {
+    setVoucherCode(null)
+    setVoucherDiscount(0)
+    setLevelDiscount((data.levelDiscount as number) || 0)
+    setOriginalSubtotal((data.originalSubtotal as number) || (data.subtotal as number) || 0)
+    setTaxAmount((data.taxAmount as number) || 0)
+    setTaxRates((data.taxRates as Array<{ name: string; rate: number; amount: number }>) || [])
+  }, [])
+
+  const initiatePaymentIntent = useCallback(
+    async (paymentID: string) => {
+      try {
+        setProcessingPayment(true)
+
+        // 1. Validate voucher reservation before payment (if voucher is applied)
+        if (user && voucherCode) {
+          const validateRes = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/voucher-validate-for-payment`,
+            {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+            },
+          )
+
+          if (!validateRes.ok) {
+            const validateData = await validateRes.json()
+            toast.error(validateData.error || 'Voucher is no longer valid.')
+            setVoucherCode(null)
+            setVoucherDiscount(0)
+            setProcessingPayment(false)
+            return // Abort payment
+          }
+
+          const validateResult = await validateRes.json()
+          if (!validateResult.valid) {
+            toast.error(validateResult.error || 'Voucher is no longer valid.')
+            setVoucherCode(null)
+            setVoucherDiscount(0)
+            setProcessingPayment(false)
+            return // Abort payment
+          }
+        }
+
+        // 2. Re-validate cart state to prevent Stale Checkout (e.g. Voucher Expired)
+        if (user && cart && typeof cart === 'object' && 'id' in cart) {
+          const patchRes = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/carts/${cart.id}`,
+            {
+              method: 'PATCH',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({}),
+            },
+          )
+
+          if (patchRes.ok) {
+            const patchData = await patchRes.json()
+            const activeCart = patchData?.doc
+
+            if (activeCart) {
+              // If we thought we had a voucher code, but the server says no, it means it expired!
+              if (voucherCode && !activeCart.voucherCode) {
+                toast.error(
+                  'Voucher has expired or is no longer valid. Your cart has been updated.',
+                )
+                setVoucherCode(null)
+                setVoucherDiscount(0)
+                setLevelDiscount(activeCart.levelDiscount || 0)
+                setOriginalSubtotal(activeCart.originalSubtotal || activeCart.subtotal || 0)
+                setProcessingPayment(false)
+                return // Abort payment
+              }
+
+              // Could also check if price changed drastically due to sale events expiring
+              // But strictly handling voucherCode disappearance is the most critical here.
+            }
+          }
+        }
+
+        const paymentData = (await initiatePayment(paymentID, {
+          additionalData: {
+            ...(email ? { customerEmail: email } : {}),
+            billingAddress,
+            shippingAddress: billingAddressSameAsShipping ? billingAddress : shippingAddress,
+          },
+        })) as Record<string, unknown>
+
+        if (paymentData) {
+          setPaymentData(paymentData)
+        }
+      } catch (error) {
+        const errorData = error instanceof Error ? JSON.parse(error.message) : {}
+        let errorMessage = 'An error occurred while initiating payment.'
+
+        if (errorData?.cause?.code === 'OutOfStock') {
+          errorMessage = 'One or more items in your cart are out of stock.'
+        }
+
+        setError(errorMessage)
+        toast.error(errorMessage)
+      } finally {
+        setProcessingPayment(false)
+      }
+    },
+    [
+      billingAddress,
+      billingAddressSameAsShipping,
+      shippingAddress,
+      email,
+      initiatePayment,
+      user,
+      cart,
+      voucherCode,
+    ],
+  )
+
+  if (!stripe) return null
+
+  if (cartIsEmpty && isProcessingPayment) {
+    return (
+      <div className="py-12 w-full items-center justify-center">
+        <div className="prose dark:prose-invert text-center max-w-none self-center mb-8">
+          <p>Processing your payment...</p>
+        </div>
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
+  if (cartIsEmpty) {
+    return (
+      <div className="prose dark:prose-invert py-12 w-full items-center">
+        <p>Your cart is empty.</p>
+        <Link href="/search">Continue shopping?</Link>
+      </div>
+    )
+  }
+
+  const displaySubtotal = originalSubtotal > 0 ? originalSubtotal : cart?.subtotal || 0
+
+  let displayTotal = Math.max(0, displaySubtotal - voucherDiscount - levelDiscount)
+
+  if (taxMode === 'exclusive') {
+    displayTotal += taxAmount
+  }
+
+  return (
+    <div className="flex flex-col items-stretch justify-stretch my-8 md:flex-row grow gap-10 md:gap-6 lg:gap-8">
+      <div className="basis-full lg:basis-2/3 flex flex-col gap-8 justify-stretch">
+        <h2 className="font-medium text-3xl">Contact</h2>
+        {!user && (
+          <div className=" bg-accent dark:bg-black rounded-lg p-4 w-full flex items-center">
+            <div className="prose dark:prose-invert">
+              <Button asChild className="no-underline text-inherit" variant="outline">
+                <Link href="/login">Log in</Link>
+              </Button>
+              <p className="mt-0">
+                <span className="mx-2">or</span>
+                <Link href="/create-account">create an account</Link>
+              </p>
+            </div>
+          </div>
+        )}
+        {user ? (
+          <div className="bg-accent dark:bg-card rounded-lg p-4 ">
+            <div>
+              <p>{user.email}</p>{' '}
+              <p>
+                Not you?{' '}
+                <Link className="underline" href="/logout">
+                  Log out
+                </Link>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-accent dark:bg-black rounded-lg p-4 ">
+            <div>
+              <p className="mb-4">Enter your email to checkout as a guest.</p>
+
+              <FormItem className="mb-6">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  disabled={!emailEditable}
+                  id="email"
+                  name="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  type="email"
+                />
+              </FormItem>
+
+              <Button
+                disabled={!email || !emailEditable}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setEmailEditable(false)
+                }}
+                variant="default"
+              >
+                Continue as guest
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <h2 className="font-medium text-3xl">Address</h2>
+
+        {billingAddress ? (
+          <div>
+            <AddressItem
+              actions={
+                <Button
+                  variant={'outline'}
+                  disabled={Boolean(paymentData)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setBillingAddress(undefined)
+                  }}
+                >
+                  Remove
+                </Button>
+              }
+              address={billingAddress}
+            />
+          </div>
+        ) : user ? (
+          <CheckoutAddresses heading="Billing address" setAddress={setBillingAddress} />
+        ) : (
+          <CreateAddressModal
+            disabled={!email || Boolean(emailEditable)}
+            callback={(address) => {
+              setBillingAddress(address)
+            }}
+            skipSubmission={true}
+          />
+        )}
+
+        <div className="flex gap-4 items-center">
+          <Checkbox
+            id="shippingTheSameAsBilling"
+            checked={billingAddressSameAsShipping}
+            disabled={Boolean(paymentData || (!user && (!email || Boolean(emailEditable))))}
+            onCheckedChange={(state) => {
+              setBillingAddressSameAsShipping(state as boolean)
+            }}
+          />
+          <Label htmlFor="shippingTheSameAsBilling">Shipping is the same as billing</Label>
+        </div>
+
+        {!billingAddressSameAsShipping && (
+          <>
+            {shippingAddress ? (
+              <div>
+                <AddressItem
+                  actions={
+                    <Button
+                      variant={'outline'}
+                      disabled={Boolean(paymentData)}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setShippingAddress(undefined)
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  }
+                  address={shippingAddress}
+                />
+              </div>
+            ) : user ? (
+              <CheckoutAddresses
+                heading="Shipping address"
+                description="Please select a shipping address."
+                setAddress={setShippingAddress}
+              />
+            ) : (
+              <CreateAddressModal
+                callback={(address) => {
+                  setShippingAddress(address)
+                }}
+                disabled={!email || Boolean(emailEditable)}
+                skipSubmission={true}
+              />
+            )}
+          </>
+        )}
+
+        {!paymentData && (
+          <Button
+            className="self-start"
+            disabled={!canGoToPayment}
+            onClick={(e) => {
+              e.preventDefault()
+              void initiatePaymentIntent('stripe')
+            }}
+          >
+            Go to payment
+          </Button>
+        )}
+
+        {!paymentData?.['clientSecret'] && error && (
+          <div className="my-8">
+            <Message error={error} />
+
+            <Button
+              onClick={(e) => {
+                e.preventDefault()
+                router.refresh()
+              }}
+              variant="default"
+            >
+              Try again
+            </Button>
+          </div>
+        )}
+
+        <Suspense fallback={<React.Fragment />}>
+          {/* @ts-expect-error - Known typing issue with rendering */}
+          {paymentData && paymentData?.['clientSecret'] && (
+            <div className="pb-16">
+              <h2 className="font-medium text-3xl">Payment</h2>
+              {error && <p>{`Error: ${error}`}</p>}
+              <Elements
+                options={{
+                  appearance: {
+                    theme: 'stripe',
+                    variables: {
+                      borderRadius: '6px',
+                      colorPrimary: '#858585',
+                      gridColumnSpacing: '20px',
+                      gridRowSpacing: '20px',
+                      colorBackground: theme === 'dark' ? '#0a0a0a' : cssVariables.colors.base0,
+                      colorDanger: cssVariables.colors.error500,
+                      colorDangerText: cssVariables.colors.error500,
+                      colorIcon:
+                        theme === 'dark' ? cssVariables.colors.base0 : cssVariables.colors.base1000,
+                      colorText: theme === 'dark' ? '#858585' : cssVariables.colors.base1000,
+                      colorTextPlaceholder: '#858585',
+                      fontFamily: 'Geist, sans-serif',
+                      fontSizeBase: '16px',
+                      fontWeightBold: '600',
+                      fontWeightNormal: '500',
+                      spacingUnit: '4px',
+                    },
+                  },
+                  clientSecret: paymentData['clientSecret'] as string,
+                }}
+                stripe={stripe}
+              >
+                <div className="flex flex-col gap-8">
+                  <CheckoutForm
+                    customerEmail={email}
+                    billingAddress={billingAddress}
+                    setProcessingPayment={setProcessingPayment}
+                  />
+                  <Button
+                    variant="ghost"
+                    className="self-start"
+                    onClick={() => setPaymentData(null)}
+                  >
+                    Cancel payment
+                  </Button>
+                </div>
+              </Elements>
+            </div>
+          )}
+        </Suspense>
+      </div>
+
+      {!cartIsEmpty && (
+        <div className="basis-full lg:basis-1/3 lg:pl-8 p-8 border-none bg-primary/5 flex flex-col gap-8 rounded-lg">
+          <h2 className="text-3xl font-medium">Your cart</h2>
+          {cart?.items?.map((item, index) => {
+            if (typeof item.product === 'object' && item.product) {
+              const {
+                product,
+                product: { meta, title, gallery },
+                quantity,
+                variant,
+              } = item
+
+              if (!quantity) return null
+
+              let image = gallery?.[0]?.image || meta?.image
+              let priceMinor = product?.priceInVND || 0
+
+              const isVariant = Boolean(variant) && typeof variant === 'object'
+
+              if (isVariant) {
+                priceMinor = variant?.priceInVND || 0
+
+                const imageVariant = product.gallery?.find(
+                  (item: { variantOption?: string | number | { id: string | number } }) => {
+                    if (!item.variantOption) return false
+                    const variantOptionID =
+                      typeof item.variantOption === 'object'
+                        ? item.variantOption.id
+                        : item.variantOption
+
+                    const hasMatch = variant?.options?.some(
+                      (option: string | number | { id: string | number }) => {
+                        if (typeof option === 'object') return option.id === variantOptionID
+                        else return option === variantOptionID
+                      },
+                    )
+
+                    return hasMatch
+                  },
+                )
+
+                if (imageVariant && typeof imageVariant.image !== 'string') {
+                  image = imageVariant.image
+                }
+              }
+
+              return (
+                <div className="flex items-start gap-4" key={index}>
+                  <div className="flex items-stretch justify-stretch h-20 w-20 p-2 rounded-lg border">
+                    <div className="relative w-full h-full">
+                      {image && typeof image !== 'string' && (
+                        <Media className="" fill imgClassName="rounded-lg" resource={image} />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex grow justify-between items-center">
+                    <div className="flex flex-col gap-1">
+                      <p className="font-medium text-lg">{title}</p>
+                      {variant && typeof variant === 'object' && (
+                        <p className="text-sm font-mono text-primary/50 tracking-widest">
+                          {variant.options
+                            ?.map(
+                              (
+                                option: string | number | { label?: string; id?: string | number },
+                              ) => {
+                                if (typeof option === 'object') return option.label
+                                return null
+                              },
+                            )
+                            .join(', ')}
+                        </p>
+                      )}
+                      <div>
+                        {'x'}
+                        {quantity}
+                      </div>
+                    </div>
+
+                    {typeof priceMinor === 'number' &&
+                      (() => {
+                        const productId = String(
+                          typeof item.product === 'object' ? item.product.id : item.product,
+                        )
+                        const salePriceMinor = salePrices[productId]
+                        if (salePriceMinor != null && salePriceMinor < priceMinor) {
+                          return (
+                            <div className="flex flex-col items-end">
+                              <Price
+                                className="text-sm text-muted-foreground line-through"
+                                amount={priceMinor}
+                              />
+                              <Price
+                                className="text-green-600 font-semibold"
+                                amount={salePriceMinor}
+                              />
+                            </div>
+                          )
+                        }
+                        return <Price amount={priceMinor} />
+                      })()}
+                  </div>
+                </div>
+              )
+            }
+            return null
+          })}
+
+          {/* Voucher Input — only for logged-in users */}
+          {user && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                Voucher Code
+              </h3>
+              <VoucherInput
+                onApplied={handleVoucherApplied}
+                onRemoved={handleVoucherRemoved}
+                currentVoucherCode={voucherCode}
+                currentVoucherDiscount={voucherDiscount}
+                disabled={Boolean(paymentData)}
+              />
+            </div>
+          )}
+
+          {/* Price Breakdown */}
+          <PriceBreakdown
+            originalSubtotal={displaySubtotal}
+            voucherDiscount={voucherDiscount}
+            levelDiscount={levelDiscount}
+            finalTotal={displayTotal}
+            voucherCode={voucherCode}
+            levelName={levelInfo?.name}
+            levelDiscountPercent={levelInfo?.discountPercent}
+            taxRates={taxRates}
+            taxMode={taxMode}
+          />
+        </div>
+      )}
+    </div>
+  )
+}

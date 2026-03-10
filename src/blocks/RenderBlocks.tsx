@@ -1,0 +1,76 @@
+import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { BannerBlock } from '@/blocks/Banner/Component'
+import { BrandSliderBlock } from '@/blocks/BrandSlider/Component'
+import { CallToActionBlock } from '@/blocks/CallToAction/Component'
+import { CarouselBlock } from '@/blocks/Carousel/Component'
+import { CategoryCarouselBlock } from '@/blocks/CategoryCarousel/Component'
+import { ContentBlock } from '@/blocks/Content/Component'
+import { FormBlock } from '@/blocks/Form/Component'
+import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { PromoBannersBlock } from '@/blocks/PromoBanners/Component'
+import { ServiceFeaturesBlock } from '@/blocks/ServiceFeatures/Component'
+import { SaleOfferBlockComponent } from '@/blocks/SaleOffer/Component'
+import { ShopByCategoriesBlockComponent } from '@/blocks/ShopByCategories/Component'
+import { ThreeItemGridBlock } from '@/blocks/ThreeItemGrid/Component'
+import { ProductListingBlock } from '@/blocks/ProductListing/Component'
+import { BlogBentoBlock } from '@/blocks/BlogBento/Component'
+import { NewsletterBlock } from '@/blocks/Newsletter/Component'
+import { toKebabCase } from '@/utilities/toKebabCase'
+import React, { Fragment } from 'react'
+
+import type { Page } from '../payload-types'
+
+const blockComponents = {
+  archive: ArchiveBlock,
+  banner: BannerBlock,
+  carousel: CarouselBlock,
+  content: ContentBlock,
+  cta: CallToActionBlock,
+  formBlock: FormBlock,
+  mediaBlock: MediaBlock,
+  promoBanners: PromoBannersBlock,
+  serviceFeatures: ServiceFeaturesBlock,
+  threeItemGrid: ThreeItemGridBlock,
+  brandSlider: BrandSliderBlock,
+  categoryCarousel: CategoryCarouselBlock,
+  saleOffer: SaleOfferBlockComponent,
+  shopByCategories: ShopByCategoriesBlockComponent,
+  productListing: ProductListingBlock,
+  blogBento: BlogBentoBlock,
+  newsletter: NewsletterBlock,
+}
+
+export const RenderBlocks: React.FC<{
+  blocks: Page['layout'][0][]
+}> = (props) => {
+  const { blocks } = props
+
+  const hasBlocks = blocks && Array.isArray(blocks) && blocks.length > 0
+
+  if (hasBlocks) {
+    return (
+      <Fragment>
+        {blocks.map((block, index) => {
+          const { blockName, blockType } = block
+
+          if (blockType && blockType in blockComponents) {
+            const Block = blockComponents[blockType]
+
+            if (Block) {
+              return (
+                <div className="debug-container" key={index}>
+                  {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                  {/* @ts-ignore - weird type mismatch here */}
+                  <Block id={toKebabCase(blockName!)} {...block} />
+                </div>
+              )
+            }
+          }
+          return null
+        })}
+      </Fragment>
+    )
+  }
+
+  return null
+}
