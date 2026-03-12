@@ -152,11 +152,8 @@ export function HeaderClient({ header, categories }: Props) {
             <Search className="rounded-none border-2 border-primary" categories={categories} />
           </div>
 
-          {/* Icons */}
+          {/* Icons (account & cart temporarily hidden) */}
           <div className="self-stretch flex items-center gap-4 md:gap-7 flex-1 md:flex-none justify-end">
-            <Link href="/account" className="hidden lg:block hover:text-primary transition-colors">
-              <User size={26} strokeWidth={1.5} />
-            </Link>
             <Link href="/wishlist" className="hover:text-primary transition-colors relative">
               <Heart size={26} strokeWidth={1.5} />
               {wishlistIds.length > 0 && (
@@ -165,23 +162,6 @@ export function HeaderClient({ header, categories }: Props) {
                 </span>
               )}
             </Link>
-            <Suspense fallback={<OpenCartButton />}>
-              <Cart
-                renderTrigger={({ quantity, subtotal }) => (
-                  <button type="button" className="flex items-center gap-3 cursor-pointer">
-                    <OpenCartButton quantity={quantity} />
-                    <div className="hidden xl:flex flex-col text-[11px] font-bold leading-tight text-left">
-                      <span className="text-muted-foreground uppercase">My Cart</span>
-                      <Price
-                        as="span"
-                        amount={typeof subtotal === 'number' ? subtotal : 0}
-                        className="text-foreground"
-                      />
-                    </div>
-                  </button>
-                )}
-              />
-            </Suspense>
           </div>
         </div>
       </div>

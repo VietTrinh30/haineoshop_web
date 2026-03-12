@@ -11,6 +11,8 @@ import { LoginForm } from '@/components/forms/LoginForm'
 import { redirect } from 'next/navigation'
 
 export default async function Login() {
+  redirect('/')
+
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })

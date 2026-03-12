@@ -73,48 +73,6 @@ export function MobileMenu({ menu }: Props) {
           ) : null}
         </div>
 
-        {user ? (
-          <div className="mt-4">
-            <h2 className="text-base font-semibold mb-4">My account</h2>
-            <hr className="my-2" />
-            <ul className="flex flex-col gap-2">
-              <li>
-                <Link href="/orders" className="text-base font-normal">
-                  Orders
-                </Link>
-              </li>
-              <li>
-                <Link href="/account/addresses" className="text-base font-normal">
-                  Addresses
-                </Link>
-              </li>
-              <li>
-                <Link href="/account" className="text-base font-normal">
-                  Manage account
-                </Link>
-              </li>
-              <li className="mt-6">
-                <Button asChild variant="outline" className="text-base font-normal">
-                  <Link href="/logout">Log out</Link>
-                </Button>
-              </li>
-            </ul>
-          </div>
-        ) : (
-          <div>
-            <h2 className="text-base font-semibold mb-4">My account</h2>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Button asChild className="w-full sm:flex-1 text-base font-normal" variant="outline">
-                <Link href="/login">Log in</Link>
-              </Button>
-              <span className="text-center text-base text-muted-foreground">or</span>
-              <Button asChild className="w-full sm:flex-1 text-base font-normal">
-                <Link href="/create-account">Create an account</Link>
-              </Button>
-            </div>
-          </div>
-        )}
-
         {/* Theme switcher at bottom - for responsive (mobile) */}
         <div className="mt-auto pt-4 border-t border-border">
           <p className="text-base font-semibold text-muted-foreground mb-2">Theme</p>

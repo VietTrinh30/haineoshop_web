@@ -70,25 +70,38 @@ export const SaleOfferClient: React.FC<ClientProps> = ({ block, product, activeS
 
   const showCountdown = Boolean(activeSaleEvent?.endsAt)
 
-  const [parts, setParts] = React.useState<CountdownParts>(() =>
-    showCountdown && activeSaleEvent?.endsAt
-      ? getCountdownParts(new Date(activeSaleEvent.endsAt as string))
-      : getCountdownParts(new Date()),
-  )
+  // const [parts, setParts] = React.useState<CountdownParts>(() =>
+  //   showCountdown && activeSaleEvent?.endsAt
+  //     ? getCountdownParts(new Date(activeSaleEvent.endsAt as string))
+  //     : getCountdownParts(new Date()),
+  // )
+  const [parts, setParts] = React.useState<CountdownParts>(() => ({
+    days: '00',
+    hours: '00',
+    minutes: '00',
+    seconds: '00',
+  }))
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   React.useEffect(() => {
+    if (!mounted) return
     if (!showCountdown || !activeSaleEvent?.endsAt) return
 
     const target = new Date(activeSaleEvent.endsAt as string)
+    setParts(getCountdownParts(target))
     const id = setInterval(() => {
       setParts(getCountdownParts(target))
     }, 1000)
 
     return () => clearInterval(id)
-  }, [activeSaleEvent?.endsAt, showCountdown])
+  }, [activeSaleEvent?.endsAt, showCountdown, mounted])
 
   const isCountdownExpired =
     showCountdown &&
+    mounted &&
     parts.days === '00' &&
     parts.hours === '00' &&
     parts.minutes === '00' &&

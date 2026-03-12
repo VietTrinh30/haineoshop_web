@@ -13,6 +13,8 @@ import { redirect } from 'next/navigation'
 import { getPayload } from 'payload'
 
 export default async function AccountPage() {
+  redirect('/')
+
   const headers = await getHeaders()
   const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })

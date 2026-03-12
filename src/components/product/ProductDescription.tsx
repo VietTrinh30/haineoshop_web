@@ -105,12 +105,6 @@ export function ProductDescription({ product }: { product: Product }) {
           <StockIndicator product={product} />
         </Suspense>
       </div>
-
-      <div className="flex items-center justify-between">
-        <Suspense fallback={null}>
-          <AddToCart product={product} />
-        </Suspense>
-      </div>
     </div>
   )
 }

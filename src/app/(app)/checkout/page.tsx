@@ -1,71 +1,73 @@
 import type { Metadata } from 'next'
 
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { Fragment } from 'react'
+// import { Fragment } from 'react'
 
-import { CheckoutPage } from '@/components/checkout/CheckoutPage'
+// import { CheckoutPage } from '@/components/checkout/CheckoutPage'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
-
+// import configPromise from '@payload-config'
+// import { getPayload } from 'payload'
+import { redirect } from 'next/navigation'
 export default async function Checkout() {
-  const payload = await getPayload({ config: configPromise })
+  // const payload = await getPayload({ config: configPromise })
 
-  const [saleEventsRes, levelSettingsRes, taxSettingsRes] = await Promise.all([
-    payload.find({
-      collection: 'sale-events',
-      where: { status: { equals: 'active' } },
-      depth: 0,
-      limit: 100,
-    }),
-    payload.findGlobal({ slug: 'user-level-settings' }),
-    payload.findGlobal({ slug: 'tax-settings' }),
-  ])
+  // const [saleEventsRes, levelSettingsRes, taxSettingsRes] = await Promise.all([
+  //   payload.find({
+  //     collection: 'sale-events',
+  //     where: { status: { equals: 'active' } },
+  //     depth: 0,
+  //     limit: 100,
+  //   }),
+  //   payload.findGlobal({ slug: 'user-level-settings' }),
+  //   payload.findGlobal({ slug: 'tax-settings' }),
+  // ])
 
-  // salePrice is a plain VND field — no conversion needed
-  const salePrices: Record<string, number> = {}
-  for (const sale of saleEventsRes.docs) {
-    const pid = typeof sale.product === 'object' ? sale.product?.id : (sale.product as number)
-    if (pid && typeof sale.salePrice === 'number') {
-      salePrices[String(pid)] = sale.salePrice
-    }
-  }
+  // // salePrice is a plain VND field — no conversion needed
+  // const salePrices: Record<string, number> = {}
+  // for (const sale of saleEventsRes.docs) {
+  //   const pid = typeof sale.product === 'object' ? sale.product?.id : (sale.product as number)
+  //   if (pid && typeof sale.salePrice === 'number') {
+  //     salePrices[String(pid)] = sale.salePrice
+  //   }
+  // }
 
-  const levels =
-    (levelSettingsRes?.levels as Array<{ level: string; discountPercent: number }>) || []
-  const taxMode = (taxSettingsRes?.taxMode as string) || 'exclusive'
+  // const levels =
+  //   (levelSettingsRes?.levels as Array<{ level: string; discountPercent: number }>) || []
+  // const taxMode = (taxSettingsRes?.taxMode as string) || 'exclusive'
 
-  return (
-    <div className="container min-h-[90vh] flex">
-      {!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
-        <div>
-          <Fragment>
-            {'To enable checkout, you must '}
-            <a
-              href="https://dashboard.stripe.com/test/apikeys"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              obtain your Stripe API Keys
-            </a>
-            {' then set them as environment variables. See the '}
-            <a
-              href="https://github.com/payloadcms/payload/blob/main/templates/ecommerce/README.md#stripe"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              README
-            </a>
-            {' for more details.'}
-          </Fragment>
-        </div>
-      )}
+  // return (
+  //   <div className="container min-h-[90vh] flex">
+  //     {!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY && (
+  //       <div>
+  //         <Fragment>
+  //           {'To enable checkout, you must '}
+  //           <a
+  //             href="https://dashboard.stripe.com/test/apikeys"
+  //             rel="noopener noreferrer"
+  //             target="_blank"
+  //           >
+  //             obtain your Stripe API Keys
+  //           </a>
+  //           {' then set them as environment variables. See the '}
+  //           <a
+  //             href="https://github.com/payloadcms/payload/blob/main/templates/ecommerce/README.md#stripe"
+  //             rel="noopener noreferrer"
+  //             target="_blank"
+  //           >
+  //             README
+  //           </a>
+  //           {' for more details.'}
+  //         </Fragment>
+  //       </div>
+  //     )}
 
-      <h1 className="sr-only">Checkout</h1>
+  //     <h1 className="sr-only">Checkout</h1>
 
-      <CheckoutPage salePrices={salePrices} levels={levels} taxMode={taxMode} />
-    </div>
-  )
+  //     <CheckoutPage salePrices={salePrices} levels={levels} taxMode={taxMode} />
+  //   </div>
+  // )
+  redirect('/')
+
 }
 
 export const metadata: Metadata = {
