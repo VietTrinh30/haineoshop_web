@@ -4,6 +4,8 @@ import type { CollectionSlug, GlobalSlug, Payload, PayloadRequest } from 'payloa
 // For example, `form-submissions` depends on `forms`, so it must be cleared first.
 const collections: CollectionSlug[] = [
   // Content + media with minimal dependencies
+  // subcategories must come before categories (FK NOT NULL constraint)
+  'subcategories',
   'categories',
   'media',
   'pages',

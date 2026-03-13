@@ -3,8 +3,8 @@ import { slugField } from 'payload'
 
 import { adminOnly } from '@/access/adminOnly'
 
-export const Categories: CollectionConfig = {
-  slug: 'categories',
+export const Subcategories: CollectionConfig = {
+  slug: 'subcategories',
   access: {
     create: adminOnly,
     delete: adminOnly,
@@ -14,6 +14,7 @@ export const Categories: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Ecommerce',
+    defaultColumns: ['title', 'category', 'slug'],
   },
   fields: [
     {
@@ -25,7 +26,7 @@ export const Categories: CollectionConfig = {
       name: 'description',
       type: 'textarea',
       admin: {
-        description: 'Short description for category cards (e.g. in Shop By Categories block).',
+        description: 'Short description for this subcategory.',
       },
     },
     {
@@ -34,28 +35,17 @@ export const Categories: CollectionConfig = {
       relationTo: 'media',
     },
     {
-      name: 'taxClasses',
+      name: 'category',
       type: 'relationship',
-      relationTo: 'taxes',
-      hasMany: true,
+      relationTo: 'categories',
+      required: true,
       admin: {
         position: 'sidebar',
-        description:
-          'Tax classes for all products in this category (unless overridden at product level).',
+        description: 'Parent category this subcategory belongs to.',
       },
     },
     slugField({
       position: undefined,
     }),
-    {
-      name: 'subcategories',
-      type: 'join',
-      collection: 'subcategories',
-      on: 'category',
-      admin: {
-        description: 'Subcategories that belong to this category.',
-        defaultColumns: ['title', 'slug'],
-      },
-    },
   ],
 }

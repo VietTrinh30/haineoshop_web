@@ -7,6 +7,7 @@ import { createSeedContext, rt, seedMediaBatch } from './helpers'
 import { contactFormData } from './contact-form'
 import { contactPageData } from './contact-page'
 import { categories as categorySeedData } from './data/categories'
+import { subcategories as subcategorySeedData } from './data/subcategories'
 import { footerData, headerData } from './data/globals'
 import { bannerMedia, blogMedia, heroMedia, legacyMedia, productMedia } from './data/media-urls'
 import { simpleProducts } from './data/products'
@@ -29,6 +30,7 @@ export const seed = async ({
   await stepMedia(ctx)
   await stepUsers(ctx)
   await stepCategories(ctx)
+  await stepSubcategories(ctx)
   await stepProducts(ctx)
   await stepSaleEvents(ctx)
   await stepForms(ctx)
@@ -111,6 +113,40 @@ async function stepCategories(ctx: SeedContext) {
 }
 
 // ──────────────────────────────────────────────
+// Step 3b: Subcategories
+// ──────────────────────────────────────────────
+
+async function stepSubcategories(ctx: SeedContext) {
+  ctx.payload.logger.info('— Seeding subcategories...')
+
+  const docs = await Promise.all(
+    subcategorySeedData.map((sub) => {
+      const parentCategory = ctx.categories[sub.categorySlug]
+      if (!parentCategory) {
+        ctx.payload.logger.warn(
+          `Subcategory "${sub.title}" skipped: parent category "${sub.categorySlug}" not found.`,
+        )
+        return null
+      }
+      return ctx.payload.create({
+        collection: 'subcategories',
+        data: {
+          title: sub.title,
+          slug: sub.slug,
+          description: sub.description,
+          category: parentCategory.id as number,
+        } as any,
+      })
+    }),
+  )
+
+  for (const doc of docs) {
+    if (!doc) continue
+    ctx.subcategories[doc.slug!] = { id: doc.id, title: doc.title, slug: doc.slug! }
+  }
+}
+
+// ──────────────────────────────────────────────
 // Step 4: Products
 // ──────────────────────────────────────────────
 
@@ -132,6 +168,7 @@ async function stepProducts(ctx: SeedContext) {
       title: 'Aurora Rose Bouquet',
       slug: 'aurora-rose-bouquet',
       categories: [ctx.categories['bouquets']?.id].filter(Boolean),
+      subcategories: [ctx.subcategories['rose-bouquets']?.id].filter(Boolean),
       enableVariants: false,
       priceInVNDEnabled: true,
       priceInVND: 250000,
@@ -210,6 +247,7 @@ async function stepProducts(ctx: SeedContext) {
       title: 'Evergreen Desk Plant',
       slug: 'evergreen-desk-plant',
       categories: [ctx.categories['indoor-plants']?.id].filter(Boolean),
+      subcategories: [ctx.subcategories['leafy-tropical-plants']?.id].filter(Boolean),
       enableVariants: true,
       variantTypes: [sizeType, colorType],
       inventory: 0,

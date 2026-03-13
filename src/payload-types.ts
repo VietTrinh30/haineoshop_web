@@ -75,6 +75,7 @@ export interface Config {
     users: User;
     pages: Page;
     categories: Category;
+    subcategories: Subcategory;
     media: Media;
     brands: Brand;
     'sale-events': SaleEvent;
@@ -104,6 +105,9 @@ export interface Config {
       addresses: 'addresses';
       wishlist: 'wishlist';
     };
+    categories: {
+      subcategories: 'subcategories';
+    };
     variantTypes: {
       options: 'variantOptions';
     };
@@ -116,6 +120,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    subcategories: SubcategoriesSelect<false> | SubcategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     brands: BrandsSelect<false> | BrandsSelect<true>;
     'sale-events': SaleEventsSelect<false> | SaleEventsSelect<true>;
@@ -392,6 +397,10 @@ export interface Product {
     description?: string | null;
   };
   categories?: (number | Category)[] | null;
+  /**
+   * Optional subcategories. Must belong to one of the selected categories above.
+   */
+  subcategories?: (number | Subcategory)[] | null;
   saleEvents?: {
     docs?: (number | SaleEvent)[];
     hasNextPage?: boolean;
@@ -762,6 +771,14 @@ export interface Category {
    */
   generateSlug?: boolean | null;
   slug: string;
+  /**
+   * Subcategories that belong to this category.
+   */
+  subcategories?: {
+    docs?: (number | Subcategory)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -776,6 +793,30 @@ export interface Tax {
    * Tax rate percentage (0 - 100).
    */
   rate: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subcategories".
+ */
+export interface Subcategory {
+  id: number;
+  title: string;
+  /**
+   * Short description for this subcategory.
+   */
+  description?: string | null;
+  image?: (number | null) | Media;
+  /**
+   * Parent category this subcategory belongs to.
+   */
+  category: number | Category;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1756,6 +1797,10 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'subcategories';
+        value: number | Subcategory;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -2292,6 +2337,21 @@ export interface CategoriesSelect<T extends boolean = true> {
   taxClasses?: T;
   generateSlug?: T;
   slug?: T;
+  subcategories?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subcategories_select".
+ */
+export interface SubcategoriesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  image?: T;
+  category?: T;
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2633,6 +2693,7 @@ export interface ProductsSelect<T extends boolean = true> {
         description?: T;
       };
   categories?: T;
+  subcategories?: T;
   saleEvents?: T;
   taxClasses?: T;
   generateSlug?: T;

@@ -13,6 +13,7 @@ export interface SeedContext {
   payload: Payload
   media: Record<string, SeedEntity & { alt: string }>
   categories: Record<string, SeedEntity & { title: string; slug: string }>
+  subcategories: Record<string, SeedEntity & { title: string; slug: string }>
   products: Record<string, SeedEntity & { title: string; slug: string }>
   users: Record<string, SeedEntity & { email: string }>
   variantTypes: Record<string, SeedEntity>
@@ -26,6 +27,7 @@ export function createSeedContext(payload: Payload): SeedContext {
     payload,
     media: {},
     categories: {},
+    subcategories: {},
     products: {},
     users: {},
     variantTypes: {},

@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url'
 
 import { Brands } from '@/collections/Brands'
 import { Categories } from '@/collections/Categories'
+import { Subcategories } from '@/collections/Subcategories'
 import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { SaleEvents } from '@/collections/SaleEvents'
@@ -52,7 +53,7 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Pages, Categories, Media, Brands, SaleEvents, Vouchers, Wishlist, Taxes],
+  collections: [Users, Pages, Categories, Subcategories, Media, Brands, SaleEvents, Vouchers, Wishlist, Taxes],
   db: sqliteAdapter({
     client: {
       url: process.env.DATABASE_URL || '',

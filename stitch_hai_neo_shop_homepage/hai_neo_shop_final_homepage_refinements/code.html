@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hai Neo Shop | Premium Cosmetics &amp; Skincare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e963a6",
+                        "background-light": "#f8f6f7",
+                        "background-dark": "#211119",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="border-b border-primary/10 px-4 md:px-20 lg:px-40 py-3">
+<div class="flex items-center justify-between gap-4 max-w-[1280px] mx-auto">
+<div class="flex items-center gap-6">
+<a class="flex items-center gap-2 group" href="#">
+<div class="size-10 flex items-center justify-center rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">pets</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-xl font-extrabold leading-tight tracking-tight">Hai Neo <span class="text-primary">Shop</span></h2>
+</a>
+<!-- Desktop Search -->
+<div class="hidden md:flex items-center bg-primary/5 dark:bg-primary/10 rounded-full px-4 py-2 w-64 lg:w-96 border border-transparent focus-within:border-primary/30 focus-within:bg-white transition-all">
+<span class="material-symbols-outlined text-primary/60 text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-primary/40" placeholder="Find your beauty essentials..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3 md:gap-6">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200">
+<span class="material-symbols-outlined">person</span>
+</button>
+<button class="relative flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute top-1 right-1 size-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold">2</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Navigation Toolbar -->
+<nav class="hidden md:block border-b border-primary/10 px-4 md:px-20 lg:px-40 py-2">
+<div class="max-w-[1280px] mx-auto flex items-center justify-between text-sm font-semibold">
+<div class="flex items-center gap-8">
+<div class="relative group cursor-pointer flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
+<span>Categories</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+<!-- Dropdown -->
+<div class="absolute top-full left-0 w-48 bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-primary/10 py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-50">
+<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Skin Care</a>
+<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Makeup</a>
+<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Body Care</a>
+<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Hair Care</a>
+<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Fragrance</a>
+<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Men's Care</a>
+</div>
+</div>
+<a class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href="#">New Products</a>
+<a class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href="#">Top Selling</a>
+<a class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href="#">Hot Deals</a>
+</div>
+</div>
+</nav>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="max-w-[1280px] mx-auto px-4 py-6 md:py-10">
+<div class="relative overflow-hidden rounded-xl md:rounded-[2rem] bg-primary/5 border border-primary/10">
+<div class="flex flex-col @[864px]:flex-row items-center gap-8 md:gap-12 px-6 py-12 md:px-16 md:py-20 lg:flex-row">
+<div class="flex-1 space-y-6 text-center lg:text-left">
+<span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">Summer Collection 2024</span>
+<h1 class="text-4xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1]">
+                                Unleash Your <br/> <span class="text-primary">Natural Glow</span>
+</h1>
+<p class="text-lg text-slate-600 dark:text-slate-300 max-w-lg mx-auto lg:mx-0">
+                                Discover our latest curated skincare sets designed for all skin types. Save up to 40% this week only.
+                            </p>
+<div class="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+<button class="px-8 py-4 bg-primary text-white rounded-full font-bold shadow-lg shadow-primary/30 hover:shadow-primary/50 hover:translate-y-[-2px] transition-all">
+                                    Shop the Sale
+                                </button>
+<button class="px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full font-bold border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-all">
+                                    View Collection
+                                </button>
+</div>
+</div>
+<div class="flex-1 w-full max-w-md lg:max-w-none">
+<div class="relative aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+<img alt="Premium aesthetic pink cosmetic product arrangement" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChYIoyk9-LbUoa-o4s3Sc63970Y3ADB9NzxyuOhdVmY9q6g84OjZbWMoHe8XCZUDsw-_-XHyjTG8J2yEiRlglUWUcmv-PFqECQmuk51u2Iu6cAM4V4mRgttrwYRGiK01B6jJygOBi-KuVptIx9J9CsFAB-xdEPCSHAJKAGjjs17TSbiv39Cw7N9Xifrhj4ijlUge-n4xDbkocWZuA-zzQw4bhYFmEuPPOnBF6IMIkDFcE7x8eTknNiqScE52MRh-2U_LeEfnN4Xg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Brand USPs -->
+<section class="max-w-[1280px] mx-auto px-4 py-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="flex items-center gap-4 p-6 bg-white dark:bg-slate-800/50 rounded-xl border border-primary/5 shadow-sm">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined">verified</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white">Genuine Products</h3>
+<p class="text-sm text-slate-500">100% authentic cosmetics</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-6 bg-white dark:bg-slate-800/50 rounded-xl border border-primary/5 shadow-sm">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white">Free Shipping</h3>
+<p class="text-sm text-slate-500">On all orders over $50</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-6 bg-white dark:bg-slate-800/50 rounded-xl border border-primary/5 shadow-sm">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-900 dark:text-white">24/7 Support</h3>
+<p class="text-sm text-slate-500">Help when you need it</p>
+</div>
+</div>
+</div>
+</section>
+<!-- New Products Section -->
+<section class="max-w-[1280px] mx-auto px-4 py-12">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">New Products</h2>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<button class="size-8 flex items-center justify-center rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-base">chevron_left</span>
+</button>
+<button class="size-8 flex items-center justify-center rounded-full border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-base">chevron_right</span>
+</button>
+</div>
+<a class="text-primary font-bold text-sm hover:underline" href="#">View All</a>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Product Card -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="New premium cosmetic product" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANAO0uEBnCVPVpNEb8LTlp86zxy_GsbO3aZW9KQCD3TcsjZHjwpu2ZM20NYMf1ygtIhJ4KkT9Bixbi3mKUyXrwA9NsG7CnYOzEhG4hVcz_XH5o36_9Us-07p6SicKUG6uZMlkT-hdO_r1twKafJuvzP9pc7_5-HZ-i9N1CzWAdV0xv34mF0J06cbn46BLAxfsg5iV2F3xtLfThjV49qxNY04Nl9xIyZJ58dmN2LxD5d5MhWlu16cMoIYpWHLB2FHMkC0wveh7zxw"/>
+<span class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">New</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Fresh Skin</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Deep Hydrating Cleansing Oil</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$25.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Premium beauty product" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5rEpi3QA0U8Vx4lsRFAo6bAg9K2IJuWq8PueGZFSesNBfSV6VukIKo52eWpI5-KnpxXo33ntpVpGN-VpbDl9Xm5zHgTJpoOduwXx_yVwA9s-sl4-1PaLG2BqSrdlz2kMKrj-DkJFJcJkmlAxAXX1gxKo6_WhmtOS3o0-oNPguyEwWgbBtnyk8i3VHYMRHLz4qMXqeKZM8mjCjP43RXcnQptUE9Ihduvk93A3mZ5IJCG_MF-kGMN08Dv34olT-bHLoxa_UMDo59w"/>
+<span class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">New</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Organic Glow</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Vitamin C Radiance Serum</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$34.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Beauty essentials" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtmRyTmuMpjpZmCWjrZ_N4DC0YCrR32uAq5BYmEhHs8OxXF35mWhv1xX3euLxyzVenn1RLS6A0Dqzb9RPLJNCwg1d4Dg2YZQccstawGztEOO8tSU3LtlnBtucnJx4_1Ay6SoIT9Qa2pPE_g7tnAz2BAm3NDDCW6ltPp43Xyb_Q9Nx0C5fRjjd11MePBhl8ZddgrRs0bLHAe5jtyDIe1bJmoVZBGlcGnKIDysB7OHxhNIRTz7xc6kNNxfqFbkuMd9Ec9ZWdSHqN-A"/>
+<span class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">New</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Velvet Kiss</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Matte Liquid Lipstick Set</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$29.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Night repair cream" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaQEXUAvTKnQGjztG-lwDqEGLIGqGFagSCwo4DUG1ATozWVNd56EaCT1ZVTFJJb2COPHNvR10KCjYv6__lUI9hwbjN-5tC-wR4NA6UCZAWMbioou0G-vwjy32Gbvt8A21HSx0j3-0_rp8Ui_5yV0xnXrcSQiAmtalJCwnBN7PofUdZCurLMZwxnwZTVWSNHkDnLugc287l2vPbuK1FS3WCbml0px6CQie2UVHLQKb4V2GeUV_E_NlHZLKjyY0rRUtcZClnJYVs2g"/>
+<span class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">New</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Pure Silk</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Overnight Repair Night Cream</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$19.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Top Selling Section -->
+<section class="max-w-[1280px] mx-auto px-4 py-12">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Top Selling</h2>
+<a class="text-primary font-bold text-sm hover:underline" href="#">View All</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Product Card -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Top selling skincare product" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5rEpi3QA0U8Vx4lsRFAo6bAg9K2IJuWq8PueGZFSesNBfSV6VukIKo52eWpI5-KnpxXo33ntpVpGN-VpbDl9Xm5zHgTJpoOduwXx_yVwA9s-sl4-1PaLG2BqSrdlz2kMKrj-DkJFJcJkmlAxAXX1gxKo6_WhmtOS3o0-oNPguyEwWgbBtnyk8i3VHYMRHLz4qMXqeKZM8mjCjP43RXcnQptUE9Ihduvk93A3mZ5IJCG_MF-kGMN08Dv34olT-bHLoxa_UMDo59w"/>
+<span class="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">Best Seller</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Organic Glow</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Vitamin C Radiance Serum</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$34.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Categories Section -->
+<section class="max-w-[1280px] mx-auto px-4 py-12">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Shop by Category</h2>
+<a class="text-primary font-bold text-sm hover:underline" href="#">View All</a>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-transparent group-hover:border-primary transition-all p-2 mb-3">
+<img alt="Skincare category icon" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCirBxJOo8ZHVijQm4hFpNYOs4oGYIkGYWChXqCVHSdztm_tbGTfI1KsnOuwwxQi7a_JwhnblTWWpfLRZK5lMxE1m6gZJbWnf0BTjUgng0ctUj68lnMUWgMYHOlmCVINKyNAr9ChSwUDsOh_LAND63or-NjpS7cbDAHVF5GPHRNqnEAxmnGkmzL9BIOtPRhsWPyTVSAIYjhsiym4WJGKDSJKn984rdcnSURlricTbp77RyXbGFBqG_BPHn8BiDH_Wd7IwR4t93Trw"/>
+</div>
+<p class="text-center font-bold text-slate-700 dark:text-slate-300">Skin Care</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-transparent group-hover:border-primary transition-all p-2 mb-3">
+<img alt="Makeup category icon" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOWM4A_gtC2jXmD7S_iW8Bxw2NPS-K4JKUgtx_6q3Y_Ote1PdxQxFkYLY3n2LELbXy9-zi5poYAyrOcV7_sqWoxb8rj_ra3CYRmKhpUgmCU12-RFxipiMPoe1duHrP0w7TdcUxPBpePi0CHg3lcTzdgB-y91KwvfsSAZqPRP18tPueHmv0bqYJUSxro--LrCLroKIeOZIhiJ-VBRqtV5pi94SvHore_gqQNNNQmXBirjEfksUbUcVjnUdTTMRReYGdnzGAYMofIQ"/>
+</div>
+<p class="text-center font-bold text-slate-700 dark:text-slate-300">Makeup</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-transparent group-hover:border-primary transition-all p-2 mb-3">
+<img alt="Body care category icon" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpReBNqaNb18ggpJV65WiML4Rw60QUXYx1bXEfQ6_tySM4-jZL-t_Pye-4vkYrKMicNH0a6M2rWfLgTDOdf0ok1y-LRpnHrm15rCib7OT5AZzM4kotd4_PFAhDObbxCHiaQoOtmKCEOBkoCPT2bJSiXQ2AeHNm2FjY2c8t4RF8BlL_YYYTgh-zDZSOzs3zyKb9v8_DkLYtoxCOe_noPBuPXWMbUOq5eSVDBzSzzB3Zm58ekEyGIH31F4I40YBvGCbjY8zHgXIK5g"/>
+</div>
+<p class="text-center font-bold text-slate-700 dark:text-slate-300">Body Care</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-transparent group-hover:border-primary transition-all p-2 mb-3">
+<img alt="Hair care category icon" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKPAkNK5ymix_dZjRTr2_9F2h74ugTVi1h710cfIcV72s3h19civvut45t3WG_FcwjRt5abMmKxsCOG7-GlUks1q4M3IxzESYntQDVQ0Cty4a-ThxJr1KdTRZBzMitVAG2TlTaGsiS-LL1gXINT-fHAS04WaTfzfWuo0TBRx6uxSdFgkOIg3JHgb4T8q0HVa6QWPtnRA0pgwuUcIhAc0MCXhF_efL8y3vQnlVvkaFePGtQmhxAbY5o_lK1ueLYh2_rukt8lIdVaw"/>
+</div>
+<p class="text-center font-bold text-slate-700 dark:text-slate-300">Hair Care</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-transparent group-hover:border-primary transition-all p-2 mb-3">
+<img alt="Fragrance category icon" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8LhA-wc-XpwKlhvwFDfqupnmAfMighiGPZOGrwqFDmH9fJa2UlT40xlqaIi7T8pUz1oXKbHFw38Ik4psQflnrDb81tbkNh5TLsLBc23TxKzvXokoatchCs35B_wcih3KI6bz0_Ta8NBOrJVXk9U_puNvMdQZPFWYj4giNWR-VSnzoFVcIaSBR-Yg9UaU7jETlob7-FiEl0QTIMEQ0QeBo1kRz54w3-Z1VxIwUIGHoqnX0m0fA_lUaTvJDSE26lCOhcL-7WICGDg"/>
+</div>
+<p class="text-center font-bold text-slate-700 dark:text-slate-300">Fragrance</p>
+</div>
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-full overflow-hidden bg-white dark:bg-slate-800 border-2 border-transparent group-hover:border-primary transition-all p-2 mb-3">
+<img alt="Men's care category icon" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgpzInvK4M1xm9_fC9rze0s829BD8oquL6SWX7XJ12tDitnIelfyRUXoF1h3SJ5nIZe6y6ti9IfSWYiqtKv-VgYNcOIFDe_s00L-30IbWYSoujb2msD_mFmahnovgfKNJPs_GwCv2kkCkuF9Id9QZWJnC9vkDzG8X_F86_86xG10McTA1rrmeQLAuGZj6xyC6dZTSfEtk0AQr1QW1mKdFpn3sYS0LlXbM1EITEzgOcVCj17VckjPU7YGRzzc3u5Ax_O56-hQ6MEg"/>
+</div>
+<p class="text-center font-bold text-slate-700 dark:text-slate-300">Men's Care</p>
+</div>
+</div>
+</section>
+<!-- Flash Sale Section -->
+<section class="max-w-[1280px] mx-auto px-4 py-12">
+<div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Flash Sale</h2>
+<div class="flex items-center gap-2">
+<span class="bg-primary text-white font-bold py-1 px-2 rounded">04</span>
+<span class="text-primary font-bold">:</span>
+<span class="bg-primary text-white font-bold py-1 px-2 rounded">22</span>
+<span class="text-primary font-bold">:</span>
+<span class="bg-primary text-white font-bold py-1 px-2 rounded">59</span>
+</div>
+</div>
+<a class="bg-primary/10 text-primary px-6 py-2 rounded-full font-bold hover:bg-primary hover:text-white transition-all" href="#">View Flash Deals</a>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Product Card 1 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Minimalist skincare serum bottle" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5rEpi3QA0U8Vx4lsRFAo6bAg9K2IJuWq8PueGZFSesNBfSV6VukIKo52eWpI5-KnpxXo33ntpVpGN-VpbDl9Xm5zHgTJpoOduwXx_yVwA9s-sl4-1PaLG2BqSrdlz2kMKrj-DkJFJcJkmlAxAXX1gxKo6_WhmtOS3o0-oNPguyEwWgbBtnyk8i3VHYMRHLz4qMXqeKZM8mjCjP43RXcnQptUE9Ihduvk93A3mZ5IJCG_MF-kGMN08Dv34olT-bHLoxa_UMDo59w"/>
+<span class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">-30%</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Organic Glow</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Vitamin C Radiance Serum</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$34.00</span>
+<span class="text-sm text-slate-400 line-through">$48.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Premium lipstick collection set" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtmRyTmuMpjpZmCWjrZ_N4DC0YCrR32uAq5BYmEhHs8OxXF35mWhv1xX3euLxyzVenn1RLS6A0Dqzb9RPLJNCwg1d4Dg2YZQccstawGztEOO8tSU3LtlnBtucnJx4_1Ay6SoIT9Qa2pPE_g7tnAz2BAm3NDDCW6ltPp43Xyb_Q9Nx0C5fRjjd11MePBhl8ZddgrRs0bLHAe5jtyDIe1bJmoVZBGlcGnKIDysB7OHxhNIRTz7xc6kNNxfqFbkuMd9Ec9ZWdSHqN-A"/>
+<span class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">-20%</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Velvet Kiss</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Matte Liquid Lipstick Set</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$29.00</span>
+<span class="text-sm text-slate-400 line-through">$36.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Cleansing oil and face wash kit" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANAO0uEBnCVPVpNEb8LTlp86zxy_GsbO3aZW9KQCD3TcsjZHjwpu2ZM20NYMf1ygtIhJ4KkT9Bixbi3mKUyXrwA9NsG7CnYOzEhG4hVcz_XH5o36_9Us-07p6SicKUG6uZMlkT-hdO_r1twKafJuvzP9pc7_5-HZ-i9N1CzWAdV0xv34mF0J06cbn46BLAxfsg5iV2F3xtLfThjV49qxNY04Nl9xIyZJ58dmN2LxD5d5MhWlu16cMoIYpWHLB2FHMkC0wveh7zxw"/>
+<span class="absolute top-3 left-3 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">New</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Fresh Skin</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Deep Hydrating Cleansing Oil</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$25.00</span>
+<span class="text-sm text-slate-400 line-through">$32.00</span>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow group cursor-pointer">
+<div class="relative aspect-square">
+<img alt="Moisturizing face cream jar" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaQEXUAvTKnQGjztG-lwDqEGLIGqGFagSCwo4DUG1ATozWVNd56EaCT1ZVTFJJb2COPHNvR10KCjYv6__lUI9hwbjN-5tC-wR4NA6UCZAWMbioou0G-vwjy32Gbvt8A21HSx0j3-0_rp8Ui_5yV0xnXrcSQiAmtalJCwnBN7PofUdZCurLMZwxnwZTVWSNHkDnLugc287l2vPbuK1FS3WCbml0px6CQie2UVHLQKb4V2GeUV_E_NlHZLKjyY0rRUtcZClnJYVs2g"/>
+<span class="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-tighter">-50%</span>
+</div>
+<div class="p-4 space-y-2">
+<p class="text-xs text-primary font-semibold uppercase">Pure Silk</p>
+<h3 class="font-bold text-slate-900 dark:text-white line-clamp-1">Overnight Repair Night Cream</h3>
+<div class="flex items-center gap-2">
+<span class="text-lg font-extrabold text-primary">$19.00</span>
+<span class="text-sm text-slate-400 line-through">$38.00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Newsletter Section -->
+<section class="max-w-[1280px] mx-auto px-4 py-16">
+<div class="bg-primary rounded-[2rem] p-10 md:p-16 relative overflow-hidden text-center md:text-left">
+<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="max-w-xl">
+<h2 class="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">Join our Glow Community</h2>
+<p class="text-white/80 text-lg">Subscribe to get exclusive offers, beauty tips, and early access to new collections.</p>
+</div>
+<div class="w-full max-w-md">
+<form class="flex flex-col sm:flex-row gap-3">
+<input class="flex-grow rounded-full border-none px-6 py-4 focus:ring-2 focus:ring-white placeholder:text-slate-400 text-slate-900" placeholder="Enter your email" type="email"/>
+<button class="bg-slate-900 text-white font-bold px-8 py-4 rounded-full hover:bg-slate-800 transition-all">Subscribe</button>
+</form>
+<p class="text-white/60 text-xs mt-3 text-center sm:text-left">By subscribing, you agree to our privacy policy.</p>
+</div>
+</div>
+<!-- Abstract design elements -->
+<div class="absolute -top-24 -right-24 size-64 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -left-24 size-64 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-white dark:bg-background-dark border-t border-primary/10 pt-16 pb-8">
+<div class="max-w-[1280px] mx-auto px-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+<div class="space-y-6">
+<a class="flex items-center gap-2" href="#">
+<div class="size-10 flex items-center justify-center rounded-full bg-primary text-white">
+<span class="material-symbols-outlined">pets</span>
+</div>
+<h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Hai Neo Shop</h2>
+</a>
+<p class="text-slate-500 text-sm leading-relaxed">
+                            Your one-stop destination for authentic skincare and cosmetics. We believe beauty is for everyone.
+                        </p>
+<div class="flex gap-4">
+<a class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-lg">public</span>
+</a>
+<a class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-lg">chat</span>
+</a>
+<a class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-lg">movie</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-wider text-xs">Shop</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">Skin Care</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Makeup</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Body &amp; Hair</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">New Arrivals</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sale</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-wider text-xs">Customer Service</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li><a class="hover:text-primary transition-colors" href="#">Contact Us</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Shipping Policy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Returns &amp; Refunds</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">FAQs</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white mb-6 uppercase tracking-wider text-xs">Contact Information</h4>
+<ul class="space-y-4 text-sm text-slate-500">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-lg">location_on</span>
+<span>123 Beauty Lane, Glow District, <br/>NY 10001, United States</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">call</span>
+<span>+1 (555) 123-4567</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-lg">mail</span>
+<span>hello@haineoshop.com</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-lg">schedule</span>
+<div>
+<span class="block font-semibold">Opening Hours</span>
+<span>Mon-Sun: 9:00 AM - 9:00 PM</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
+<p class="text-xs text-slate-400">© 2024 Hai Neo Shop. All rights reserved. Designed with love for beauty.</p>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
