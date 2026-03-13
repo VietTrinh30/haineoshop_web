@@ -124,6 +124,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     variants: true,
     enableVariants: true,
     gallery: true,
+    featuredVideo: true,
     priceInVND: true,
     inventory: true,
     meta: true,
@@ -208,6 +209,22 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   },
                 },
               ],
+            },
+            {
+              name: 'featuredVideo',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Featured Video',
+              admin: {
+                description: 'Optional single product video shown separately from the image gallery.',
+              },
+              filterOptions: () => {
+                return {
+                  mimeType: {
+                    contains: 'video',
+                  },
+                }
+              },
             },
 
             {

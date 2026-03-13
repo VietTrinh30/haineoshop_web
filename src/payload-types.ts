@@ -373,6 +373,10 @@ export interface Product {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional single product video shown separately from the image gallery.
+   */
+  featuredVideo?: (number | null) | Media;
   layout?: (CallToActionBlock | ContentBlock | MediaBlock)[] | null;
   inventory?: number | null;
   enableVariants?: boolean | null;
@@ -2671,6 +2675,7 @@ export interface ProductsSelect<T extends boolean = true> {
         variantOption?: T;
         id?: T;
       };
+  featuredVideo?: T;
   layout?:
     | T
     | {

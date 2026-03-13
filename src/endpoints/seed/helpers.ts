@@ -49,11 +49,26 @@ export async function fetchFileByURL(url: string): Promise<File> {
   }
 
   const data = await res.arrayBuffer()
+  const contentType = res.headers.get('content-type')?.split(';')[0]?.trim()
+  const extension = url.split('.').pop()?.toLowerCase()
+  const fallbackMimeByExtension: Record<string, string> = {
+    avif: 'image/avif',
+    gif: 'image/gif',
+    jpeg: 'image/jpeg',
+    jpg: 'image/jpeg',
+    mp4: 'video/mp4',
+    png: 'image/png',
+    svg: 'image/svg+xml',
+    webm: 'video/webm',
+    webp: 'image/webp',
+  }
+  const mimetype =
+    contentType && contentType.includes('/') ? contentType : fallbackMimeByExtension[extension || '']
 
   return {
     name: url.split('/').pop() || `file-${Date.now()}`,
     data: Buffer.from(data),
-    mimetype: `image/${url.split('.').pop()}`,
+    mimetype: mimetype || 'application/octet-stream',
     size: data.byteLength,
   }
 }
