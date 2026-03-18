@@ -113,7 +113,6 @@ export interface Config {
     };
     products: {
       variants: 'variants';
-      saleEvents: 'sale-events';
     };
   };
   collectionsSelect: {
@@ -391,6 +390,10 @@ export interface Product {
    * Price in VND (e.g. 500000).
    */
   priceInVND?: number | null;
+  /**
+   * Set a Hot Deal sale price (VND). When present, this price is shown instead of the regular price. A product with a Hot Deal price cannot be added to any active or scheduled sale event.
+   */
+  hotDealPrice?: number | null;
   relatedProducts?: (number | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -405,11 +408,6 @@ export interface Product {
    * Optional subcategories. Must belong to one of the selected categories above.
    */
   subcategories?: (number | Subcategory)[] | null;
-  saleEvents?: {
-    docs?: (number | SaleEvent)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
   /**
    * Specific tax classes for this product. Overrides category and default taxes.
    */
@@ -1352,37 +1350,6 @@ export interface Variant {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sale-events".
- */
-export interface SaleEvent {
-  id: number;
-  /**
-   * Internal name for this sale (e.g. Spring bouquet sale).
-   */
-  title: string;
-  /**
-   * Product this sale event applies to. Set automatically when creating from a product.
-   */
-  product: number | Product;
-  /**
-   * Sale price in VND (e.g. 100000). This does not change the original product price.
-   */
-  salePrice: number;
-  /**
-   * Status is usually derived from the start / end time, but can be overridden.
-   */
-  status?: ('scheduled' | 'active' | 'expired') | null;
-  startsAt: string;
-  endsAt: string;
-  /**
-   * Optional notes for marketing or operations.
-   */
-  notes?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "transactions".
  */
 export interface Transaction {
@@ -1637,6 +1604,42 @@ export interface Wishlist {
   id: number;
   customer: number | User;
   product: number | Product;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sale-events".
+ */
+export interface SaleEvent {
+  id: number;
+  /**
+   * Internal name for this campaign (e.g. Valentine's Day Sale 2025).
+   */
+  title: string;
+  /**
+   * Add each product and its sale price for this campaign.
+   */
+  items?:
+    | {
+        product: number | Product;
+        /**
+         * Sale price in VND for this product. Does not change the product's original price.
+         */
+        salePrice: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Status is normally derived from the start/end time by the background job, but can be overridden.
+   */
+  status?: ('scheduled' | 'active' | 'expired') | null;
+  startsAt: string;
+  endsAt: string;
+  /**
+   * Optional notes for marketing or operations.
+   */
+  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2395,8 +2398,13 @@ export interface BrandsSelect<T extends boolean = true> {
  */
 export interface SaleEventsSelect<T extends boolean = true> {
   title?: T;
-  product?: T;
-  salePrice?: T;
+  items?:
+    | T
+    | {
+        product?: T;
+        salePrice?: T;
+        id?: T;
+      };
   status?: T;
   startsAt?: T;
   endsAt?: T;
@@ -2689,6 +2697,7 @@ export interface ProductsSelect<T extends boolean = true> {
   variants?: T;
   priceInVNDEnabled?: T;
   priceInVND?: T;
+  hotDealPrice?: T;
   relatedProducts?: T;
   meta?:
     | T
@@ -2699,7 +2708,6 @@ export interface ProductsSelect<T extends boolean = true> {
       };
   categories?: T;
   subcategories?: T;
-  saleEvents?: T;
   taxClasses?: T;
   generateSlug?: T;
   slug?: T;

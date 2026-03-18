@@ -34,6 +34,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     ...(defaultCollection?.hooks ?? {}),
     beforeValidate: [
       ...(defaultCollection?.hooks?.beforeValidate ?? []),
+      // Validate subcategory <-> category membership
       async ({ data, req, operation }) => {
         if (!data?.subcategories || !Array.isArray(data.subcategories) || data.subcategories.length === 0) {
           return data
@@ -94,6 +95,44 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
 
         return data
       },
+      // Validate Hot Deal exclusivity: a product with hotDealPrice cannot be part of an active/scheduled sale event
+      async ({ data, req, originalDoc }) => {
+        const hotDealPrice = data?.hotDealPrice
+        if (!hotDealPrice || typeof hotDealPrice !== 'number' || hotDealPrice <= 0) {
+          return data
+        }
+
+        const productId = originalDoc?.id ?? data?.id
+        if (!productId) return data
+
+        const conflicting = await req.payload.find({
+          collection: 'sale-events',
+          where: {
+            and: [
+              { 'items.product': { equals: String(productId) } },
+              { status: { in: ['active', 'scheduled'] } },
+            ],
+          },
+          limit: 5,
+          depth: 0,
+          overrideAccess: true,
+          req,
+        })
+
+        if (conflicting.docs.length > 0) {
+          const titles = conflicting.docs.map((d) => `"${d.title}"`).join(', ')
+          throw new ValidationError({
+            errors: [
+              {
+                message: `Cannot set a Hot Deal price: this product is already part of active or scheduled sale event(s): ${titles}. Remove it from those events first.`,
+                path: 'hotDealPrice',
+              },
+            ],
+          })
+        }
+
+        return data
+      },
     ],
   },
   admin: {
@@ -128,7 +167,6 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     priceInVND: true,
     inventory: true,
     meta: true,
-    saleEvents: true,
   },
   fields: [
     { name: 'title', type: 'text', required: true },
@@ -284,6 +322,16 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               return field
             }),
             {
+              name: 'hotDealPrice',
+              type: 'number',
+              label: 'Hot Deal Price (VND)',
+              required: false,
+              admin: {
+                description:
+                  'Set a Hot Deal sale price (VND). When present, this price is shown instead of the regular price. A product with a Hot Deal price cannot be added to any active or scheduled sale event.',
+              },
+            },
+            {
               name: 'relatedProducts',
               type: 'relationship',
               filterOptions: ({ id }) => {
@@ -367,16 +415,6 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
             typeof c === 'object' && c !== null ? c.id : c,
         ) as (string | number)[]
         return { category: { in: categoryIds } }
-      },
-    },
-    {
-      name: 'saleEvents',
-      type: 'join',
-      collection: 'sale-events',
-      on: 'product',
-      admin: {
-        allowCreate: true,
-        defaultColumns: ['title', 'status', 'salePrice', 'startsAt', 'endsAt'],
       },
     },
     {

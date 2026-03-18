@@ -1,39 +1,43 @@
 import type { Product, SaleEvent } from '@/payload-types'
 
 /**
- * Get the active sale event for a product
+ * Find the active sale event (campaign) for a given product ID from a list of
+ * pre-fetched campaign docs.  Each campaign has `items[]` with product + salePrice.
+ *
+ * Usage (server-side): fetch active campaigns once, then call this per product.
  */
-export function getActiveSaleEvent(product: Partial<Product>): SaleEvent | null {
-  if (!product.saleEvents?.docs?.length) {
-    return null
-  }
-
+export function findActiveCampaignForProduct(
+  productId: string | number,
+  campaigns: SaleEvent[],
+): { salePrice: number; campaign: SaleEvent } | null {
+  const pid = String(productId)
   const now = new Date()
 
-  // Find the first active sale event
-  const activeSale = product.saleEvents.docs.find((saleEventDoc) => {
-    if (typeof saleEventDoc === 'number') return false
+  for (const campaign of campaigns) {
+    const isActive =
+      campaign.status === 'active' ||
+      (campaign.status !== 'expired' &&
+        new Date(campaign.startsAt) <= now &&
+        new Date(campaign.endsAt) >= now)
 
-    const saleEvent = saleEventDoc as SaleEvent
+    if (!isActive) continue
 
-    // Check if status is explicitly set to active
-    if (saleEvent.status === 'active') {
-      return true
+    const items = campaign.items as Array<{ product: unknown; salePrice: number }> | undefined
+    if (!items?.length) continue
+
+    for (const item of items) {
+      const itemPid = String(
+        typeof item.product === 'object' && item.product !== null
+          ? (item.product as { id: string | number }).id
+          : item.product,
+      )
+      if (itemPid === pid && item.salePrice != null) {
+        return { salePrice: item.salePrice, campaign }
+      }
     }
+  }
 
-    // Check if status is not explicitly expired and dates are valid
-    if (saleEvent.status === 'expired') {
-      return false
-    }
-
-    // Check date range if status is scheduled or null
-    const startsAt = new Date(saleEvent.startsAt)
-    const endsAt = new Date(saleEvent.endsAt)
-
-    return now >= startsAt && now <= endsAt
-  })
-
-  return activeSale && typeof activeSale !== 'number' ? activeSale : null
+  return null
 }
 
 /**
@@ -45,18 +49,20 @@ export function calculateDiscountPercentage(originalPrice: number, salePrice: nu
 }
 
 /**
- * Get the effective price for a product (sale price if on sale, otherwise regular price).
+ * Get the effective price for a product given a list of active campaigns.
+ * Pass fetched campaigns from the server — the product itself no longer embeds sale events.
  *
  * With VND currency (decimals: 0), priceInVND is stored as-is (no ×100 factor).
- * salePrice is also a plain VND number.
- *
- * @returns Object with prices in VND.
  */
-export function getEffectivePrice(product: Partial<Product>): {
+export function getEffectivePrice(
+  product: Partial<Product>,
+  campaigns: SaleEvent[] = [],
+): {
   price: number
   originalPrice?: number
   saleEvent?: SaleEvent
   isOnSale: boolean
+  isHotDeal?: boolean
 } {
   let basePrice = product.priceInVND ?? 0
 
@@ -78,15 +84,31 @@ export function getEffectivePrice(product: Partial<Product>): {
     return { price: 0, isOnSale: false }
   }
 
-  const activeSale = getActiveSaleEvent(product)
-
-  if (activeSale) {
-    const salePrice = activeSale.salePrice
+  // Hot Deal takes priority over sale events — they are mutually exclusive by validation,
+  // but Hot Deal is checked first as a defensive measure.
+  const hotDealPrice = (product as Product & { hotDealPrice?: number | null }).hotDealPrice
+  if (typeof hotDealPrice === 'number' && hotDealPrice > 0 && hotDealPrice < basePrice) {
     return {
-      price: salePrice,
+      price: hotDealPrice,
       originalPrice: basePrice,
-      saleEvent: activeSale,
       isOnSale: true,
+      isHotDeal: true,
+    }
+  }
+
+  if (!product.id) {
+    return { price: basePrice, isOnSale: false }
+  }
+
+  const match = findActiveCampaignForProduct(product.id, campaigns)
+
+  if (match) {
+    return {
+      price: match.salePrice,
+      originalPrice: basePrice,
+      saleEvent: match.campaign,
+      isOnSale: true,
+      isHotDeal: false,
     }
   }
 

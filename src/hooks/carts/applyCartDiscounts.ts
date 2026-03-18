@@ -77,21 +77,17 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
   // --- PHASE 2: Fetch Level 1 Resources Concurrently (depth: 0) ---
   const [salesRes, productsRes, variantsRes, voucherRes, userRes, userSettingsRes, taxSettingsRes] =
     await Promise.all([
-      // 1. Sales
-      allProductIds.length > 0
-        ? req.payload
-            .find({
-              collection: 'sale-events',
-              where: {
-                and: [{ product: { in: allProductIds } }, { status: { equals: 'active' } }],
-              },
-              limit: 100,
-              depth: 0,
-              overrideAccess: true,
-              req,
-            })
-            .catch(() => ({ docs: [] }))
-        : { docs: [] },
+      // 1. Active sale campaigns — fetch all active campaigns and resolve per-product price below
+      req.payload
+        .find({
+          collection: 'sale-events',
+          where: { status: { equals: 'active' } },
+          limit: 100,
+          depth: 1,
+          overrideAccess: true,
+          req,
+        })
+        .catch(() => ({ docs: [] })),
 
       // 2. Products - Explicitly depth 0 to avoid massive nested data queries
       allProductIds.length > 0
@@ -101,7 +97,7 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
               where: { id: { in: allProductIds } },
               limit: allProductIds.length,
               depth: 0,
-              select: { priceInVND: true, taxClasses: true, categories: true },
+              select: { priceInVND: true, hotDealPrice: true, taxClasses: true, categories: true },
               overrideAccess: true,
               req,
             })
@@ -158,10 +154,17 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
     ])
 
   // --- Build Caches & Setup Level 2 Tax Fetching ---
+  // Build salePriceMap from campaign items[]: each campaign doc has items[] with product + salePrice
   const salePriceMap = new Map<string, number>()
-  salesRes.docs.forEach((s) => {
-    const pid = extractId(s.product)
-    if (!salePriceMap.has(pid) && s.salePrice != null) salePriceMap.set(pid, s.salePrice as number)
+  salesRes.docs.forEach((campaign) => {
+    const items = campaign.items as Array<{ product: unknown; salePrice: number }> | undefined
+    if (!items?.length) return
+    for (const item of items) {
+      const pid = extractId(item.product)
+      if (pid && productIdsToFetch.has(pid) && !salePriceMap.has(pid) && item.salePrice != null) {
+        salePriceMap.set(pid, item.salePrice)
+      }
+    }
   })
 
   const productMap = new Map<string, any>()
@@ -254,8 +257,19 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
   // CALCULATION LOGIC (Fully Synchronous in-memory lookup => O(N) complexity)
   // ------------------------------------------------------------------------------------------------
 
+  const hotDealPriceMap = new Map<string, number>()
+  productsRes.docs.forEach((p) => {
+    const hotDeal = (p as any).hotDealPrice
+    const basePrice = p.priceInVND ?? 0
+    if (typeof hotDeal === 'number' && hotDeal > 0 && hotDeal < basePrice) {
+      hotDealPriceMap.set(String(p.id), hotDeal)
+    }
+  })
+
   const getItemPrice = (item: CartItem): number => {
     const pid = extractId(item.product)
+    // Hot Deal takes priority — mutually exclusive with sale events by validation
+    if (hotDealPriceMap.has(pid)) return hotDealPriceMap.get(pid)!
     if (salePriceMap.has(pid)) return salePriceMap.get(pid)!
     if (item.variant) return variantPriceMap.get(extractId(item.variant)) ?? 0
     return productPriceMap.get(pid) ?? 0
