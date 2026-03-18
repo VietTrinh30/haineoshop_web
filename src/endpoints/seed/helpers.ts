@@ -41,16 +41,7 @@ export function createSeedContext(payload: Payload): SeedContext {
 // Media helpers
 // ──────────────────────────────────────────────
 
-export async function fetchFileByURL(url: string): Promise<File> {
-  const res = await fetch(url, { credentials: 'include', method: 'GET' })
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch file from ${url}, status: ${res.status}`)
-  }
-
-  const data = await res.arrayBuffer()
-  const contentType = res.headers.get('content-type')?.split(';')[0]?.trim()
-  const extension = url.split('.').pop()?.toLowerCase()
+export async function fetchFileByURL(url: string, maxRetries = 4): Promise<File> {
   const fallbackMimeByExtension: Record<string, string> = {
     avif: 'image/avif',
     gif: 'image/gif',
@@ -62,15 +53,49 @@ export async function fetchFileByURL(url: string): Promise<File> {
     webm: 'video/webm',
     webp: 'image/webp',
   }
-  const mimetype =
-    contentType && contentType.includes('/') ? contentType : fallbackMimeByExtension[extension || '']
 
-  return {
-    name: url.split('/').pop() || `file-${Date.now()}`,
-    data: Buffer.from(data),
-    mimetype: mimetype || 'application/octet-stream',
-    size: data.byteLength,
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`[seed] Fetching media (attempt ${attempt}/${maxRetries}): ${url}`)
+    try {
+      const res = await fetch(url, { method: 'GET' })
+
+      if (!res.ok) {
+        console.error(`[seed] HTTP ${res.status} fetching: ${url}`)
+        throw new Error(`Failed to fetch file from ${url}, status: ${res.status}`)
+      }
+
+      console.log(`[seed] OK (${res.status}) fetched: ${url}`)
+
+      const data = await res.arrayBuffer()
+      const contentType = res.headers.get('content-type')?.split(';')[0]?.trim()
+      const extension = url.split('.').pop()?.toLowerCase()
+      const mimetype =
+        contentType && contentType.includes('/') ? contentType : fallbackMimeByExtension[extension || '']
+
+      return {
+        name: url.split('/').pop() || `file-${Date.now()}`,
+        data: Buffer.from(data),
+        mimetype: mimetype || 'application/octet-stream',
+        size: data.byteLength,
+      }
+    } catch (err) {
+      const isNetworkError =
+        err instanceof TypeError ||
+        (err instanceof Error && (err.message.includes('ECONNRESET') || err.message.includes('fetch failed')))
+
+      if (isNetworkError && attempt < maxRetries) {
+        const delay = 500 * attempt
+        console.warn(`[seed] Network error on attempt ${attempt}, retrying in ${delay}ms: ${url}`)
+        await new Promise((r) => setTimeout(r, delay))
+        continue
+      }
+
+      console.error(`[seed] Failed after ${attempt} attempt(s): ${url}`, err)
+      throw err
+    }
   }
+
+  throw new Error(`[seed] Exhausted retries for: ${url}`)
 }
 
 export interface MediaEntry {
@@ -79,11 +104,23 @@ export interface MediaEntry {
   alt: string
 }
 
+const FETCH_CONCURRENCY = 4
+const FETCH_BATCH_DELAY_MS = 300
+
 export async function seedMediaBatch(
   ctx: SeedContext,
   entries: MediaEntry[],
 ): Promise<void> {
-  const files = await Promise.all(entries.map((e) => fetchFileByURL(e.url)))
+  // Fetch in small concurrent batches to avoid overwhelming external hosts
+  const files: File[] = []
+  for (let i = 0; i < entries.length; i += FETCH_CONCURRENCY) {
+    const batch = entries.slice(i, i + FETCH_CONCURRENCY)
+    const batchFiles = await Promise.all(batch.map((e) => fetchFileByURL(e.url)))
+    files.push(...batchFiles)
+    if (i + FETCH_CONCURRENCY < entries.length) {
+      await new Promise((r) => setTimeout(r, FETCH_BATCH_DELAY_MS))
+    }
+  }
 
   const docs = await Promise.all(
     entries.map((entry, i) =>

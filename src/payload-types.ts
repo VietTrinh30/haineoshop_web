@@ -394,6 +394,14 @@ export interface Product {
    * Set a Hot Deal sale price (VND). When present, this price is shown instead of the regular price. A product with a Hot Deal price cannot be added to any active or scheduled sale event.
    */
   hotDealPrice?: number | null;
+  /**
+   * Enable to include this product in top-selling listings.
+   */
+  isTopSelling?: boolean | null;
+  /**
+   * Lower numbers are displayed first (1 appears before 2).
+   */
+  topSellingOrder?: number | null;
   relatedProducts?: (number | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -2698,6 +2706,8 @@ export interface ProductsSelect<T extends boolean = true> {
   priceInVNDEnabled?: T;
   priceInVND?: T;
   hotDealPrice?: T;
+  isTopSelling?: T;
+  topSellingOrder?: T;
   relatedProducts?: T;
   meta?:
     | T

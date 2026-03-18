@@ -124,10 +124,13 @@ export const SaleOfferClient: React.FC<ClientProps> = ({ block, product, activeS
     }
   }
 
-  // salePrice is a plain number field — no conversion needed
-  const displayPrice = activeSaleEvent ? activeSaleEvent.salePrice : basePrice || 0
-  const originalPrice = activeSaleEvent ? basePrice : undefined
-  const isOnSale = Boolean(activeSaleEvent)
+  // resolvedSalePrice is set by Component.tsx when an active campaign covers this product
+  const resolvedSalePrice = activeSaleEvent
+    ? (activeSaleEvent as SaleEvent & { resolvedSalePrice?: number }).resolvedSalePrice ?? null
+    : null
+  const displayPrice = resolvedSalePrice != null ? resolvedSalePrice : basePrice || 0
+  const originalPrice = resolvedSalePrice != null ? basePrice : undefined
+  const isOnSale = resolvedSalePrice != null
 
   const displayTitle = linkedProduct?.title
   const productHref = `/products/${linkedProduct.slug}`

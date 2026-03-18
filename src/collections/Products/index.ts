@@ -332,6 +332,34 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               },
             },
             {
+              name: 'isTopSelling',
+              type: 'checkbox',
+              label: 'Top Selling Product',
+              defaultValue: false,
+              admin: {
+                description: 'Enable to include this product in top-selling listings.',
+              },
+            },
+            {
+              name: 'topSellingOrder',
+              type: 'number',
+              label: 'Top Selling Display Order',
+              admin: {
+                condition: (data) => data?.isTopSelling === true,
+                description: 'Lower numbers are displayed first (1 appears before 2).',
+              },
+              validate: (
+                value: unknown,
+                { siblingData }: { siblingData?: { isTopSelling?: boolean } },
+              ) => {
+                if (!siblingData?.isTopSelling) return true
+                if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
+                  return 'Display order is required and must be a positive whole number when Top Selling is enabled.'
+                }
+                return true
+              },
+            },
+            {
               name: 'relatedProducts',
               type: 'relationship',
               filterOptions: ({ id }) => {

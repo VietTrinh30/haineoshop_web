@@ -373,6 +373,7 @@ async function stepSaleEvents(ctx: SeedContext) {
   ctx.payload.logger.info('— Seeding sale events...')
 
   const aurora = ctx.products['aurora-rose-bouquet']
+  const evergreen = ctx.products['evergreen-desk-plant']
   if (!aurora) return
 
   const now = new Date()
@@ -380,14 +381,26 @@ async function stepSaleEvents(ctx: SeedContext) {
   await ctx.payload.create({
     collection: 'sale-events',
     data: {
-      title: 'Aurora Rose Bouquet Launch Offer',
-      product: aurora.id as number,
-      salePrice: Math.floor(250000 * 0.8),
+      title: 'Spring Launch Campaign',
       status: 'active',
       startsAt: new Date(now.getTime() - 3600000).toISOString(),
       endsAt: new Date(now.getTime() + 7 * 86400000).toISOString(),
-      notes: 'Seeded example sale event.',
-    },
+      notes: 'Seeded example campaign covering multiple products.',
+      items: [
+        {
+          product: aurora.id as number,
+          salePrice: Math.floor(250000 * 0.8),
+        },
+        ...(evergreen
+          ? [
+              {
+                product: evergreen.id as number,
+                salePrice: Math.floor(220000 * 0.85),
+              },
+            ]
+          : []),
+      ],
+    } as any,
   })
 }
 
