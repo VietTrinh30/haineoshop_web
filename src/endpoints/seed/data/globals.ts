@@ -34,3 +34,11 @@ export const footerData = {
   ],
   copyrightText: 'LUKANI. Made with ❤️ for plants.',
 }
+
+export const generalSettingsData = {
+  newProductDays: 30,
+  contactNumber: '+01 23456789',
+  facebookPageLink: 'https://www.facebook.com/lukani',
+  instagramPageLink: 'https://www.instagram.com/lukani',
+  tiktokPageLink: 'https://www.tiktok.com/@lukani',
+}

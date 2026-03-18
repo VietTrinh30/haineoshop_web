@@ -29,6 +29,7 @@ import { removeVoucherFromCart } from '@/endpoints/removeVoucherFromCart'
 import { validateVoucher } from '@/endpoints/validateVoucher'
 import { validateVoucherForPayment } from '@/endpoints/validateVoucherForPayment'
 import { Footer } from '@/globals/Footer'
+import { GeneralSettings } from '@/globals/GeneralSettings'
 import { Header } from '@/globals/Header'
 import { ShippingSettings } from '@/globals/ShippingSettings'
 import { TaxSettings } from '@/globals/TaxSettings'
@@ -114,7 +115,7 @@ export default buildConfig({
     removeVoucherFromCart,
     validateVoucherForPayment,
   ],
-  globals: [Header, Footer, UserLevelSettings, TaxSettings, ShippingSettings],
+  globals: [Header, Footer, UserLevelSettings, TaxSettings, ShippingSettings, GeneralSettings],
   plugins,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

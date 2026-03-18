@@ -152,6 +152,7 @@ export interface Config {
     'user-level-settings': UserLevelSetting;
     'tax-settings': TaxSetting;
     'shipping-settings': ShippingSetting;
+    'general-settings': GeneralSetting;
     'payload-jobs-stats': PayloadJobsStat;
   };
   globalsSelect: {
@@ -160,6 +161,7 @@ export interface Config {
     'user-level-settings': UserLevelSettingsSelect<false> | UserLevelSettingsSelect<true>;
     'tax-settings': TaxSettingsSelect<false> | TaxSettingsSelect<true>;
     'shipping-settings': ShippingSettingsSelect<false> | ShippingSettingsSelect<true>;
+    'general-settings': GeneralSettingsSelect<false> | GeneralSettingsSelect<true>;
     'payload-jobs-stats': PayloadJobsStatsSelect<false> | PayloadJobsStatsSelect<true>;
   };
   locale: null;
@@ -3074,6 +3076,37 @@ export interface ShippingSetting {
   createdAt?: string | null;
 }
 /**
+ * Configure global product age and storefront contact/social metadata.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "general-settings".
+ */
+export interface GeneralSetting {
+  id: number;
+  /**
+   * Number of days after creation that a product is considered new. Product is new when current date - createdAt < this value.
+   */
+  newProductDays: number;
+  /**
+   * Primary contact number used across storefront surfaces.
+   */
+  contactNumber?: string | null;
+  /**
+   * Facebook page URL (optional).
+   */
+  facebookPageLink?: string | null;
+  /**
+   * Instagram page URL (optional).
+   */
+  instagramPageLink?: string | null;
+  /**
+   * TikTok page URL (optional).
+   */
+  tiktokPageLink?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-jobs-stats".
  */
@@ -3205,6 +3238,20 @@ export interface TaxSettingsSelect<T extends boolean = true> {
 export interface ShippingSettingsSelect<T extends boolean = true> {
   defaultFee?: T;
   freeShippingThreshold?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "general-settings_select".
+ */
+export interface GeneralSettingsSelect<T extends boolean = true> {
+  newProductDays?: T;
+  contactNumber?: T;
+  facebookPageLink?: T;
+  instagramPageLink?: T;
+  tiktokPageLink?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

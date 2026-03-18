@@ -8,7 +8,7 @@ import { contactFormData } from './contact-form'
 import { contactPageData } from './contact-page'
 import { categories as categorySeedData } from './data/categories'
 import { subcategories as subcategorySeedData } from './data/subcategories'
-import { footerData, headerData } from './data/globals'
+import { footerData, generalSettingsData, headerData } from './data/globals'
 import { bannerMedia, blogMedia, heroMedia, legacyMedia, productMedia } from './data/media-urls'
 import { simpleProducts } from './data/products'
 import { homePageData } from './home'
@@ -459,6 +459,7 @@ async function stepGlobals(ctx: SeedContext) {
   await Promise.all([
     ctx.payload.updateGlobal({ slug: 'header', data: headerData }),
     ctx.payload.updateGlobal({ slug: 'footer', data: footerData }),
+    ctx.payload.updateGlobal({ slug: 'general-settings', data: generalSettingsData }),
   ])
 }
 

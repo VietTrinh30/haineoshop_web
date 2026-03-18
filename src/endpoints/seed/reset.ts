@@ -26,7 +26,7 @@ const collections: CollectionSlug[] = [
   'orders',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+const globals: GlobalSlug[] = ['header', 'footer', 'general-settings']
 
 export async function resetDatabase({
   payload,
