@@ -2,18 +2,17 @@
 
 import { Cart } from '@/components/Cart'
 import { OpenCartButton } from '@/components/Cart/OpenCart'
-import { CMSLink } from '@/components/Link'
+import { CategoriesNavBar } from '@/components/Header/CategoriesNavBar'
+import { MobileMenu } from '@/components/Header/MobileMenu'
+import { Search } from '@/components/layout/search/Search'
 import Link from 'next/link'
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useMemo } from 'react'
 
 import { Category, Header } from '@/payload-types'
 import { useTheme } from '@/providers/Theme'
-import { cn } from '@/utilities/cn'
-import { ChevronDown, Menu as MenuIcon, Phone } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { usePathname, useSearchParams } from 'next/navigation'
 
-import { MobileMenu } from '@/components/Header/MobileMenu'
-import { Search } from '@/components/layout/search/Search'
 import { useAuth } from '@/providers/Auth'
 
 type Props = {
@@ -27,8 +26,6 @@ export function HeaderClient({ header, categories }: Props) {
   const searchParams = useSearchParams()
   const currentCategoryId = searchParams.get('category')
 
-  const [isSticky, setIsSticky] = useState(false)
-  const [showCategories, setShowCategories] = useState(false)
   const { theme = 'light', setTheme } = useTheme()
   const { user } = useAuth()
 
@@ -73,14 +70,6 @@ export function HeaderClient({ header, categories }: Props) {
 
     return `+${country}${restFormatted ? ` ${restFormatted}` : ''}`
   }, [contactNumber])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsSticky(window.scrollY > 150)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   return (
     <header className="relative z-50 w-full bg-white text-black" data-theme="light">
@@ -192,132 +181,13 @@ export function HeaderClient({ header, categories }: Props) {
         </div>
       </div>
 
-      {/* Categories bar: overflow-visible so dropdown can overlap content below */}
-      <div
-        className={cn(
-          'relative z-50 transition-all duration-300 overflow-visible py-1 md:py-2',
-          isSticky
-            ? 'fixed top-0 left-0 right-0 shadow-md translate-y-0 bg-white border-y border-[#E963A6]/10'
-            : 'bg-white border-y border-[#E963A6]/10',
-        )}
-      >
-        <div className="container debug-container flex flex-row items-center justify-between gap-2 md:gap-0">
-          {/* Categories Dropdown - full width on mobile, fixed width on desktop */}
-          <div className="relative w-full md:w-64 md:shrink-0">
-            <button
-              type="button"
-              className="bg-primary text-white w-full py-3 px-3 md:px-4 flex items-center justify-between font-medium text-left touch-manipulation cursor-pointer select-none"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setShowCategories((prev) => !prev)
-              }}
-              aria-expanded={showCategories}
-              aria-haspopup="true"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                <MenuIcon size={20} className="shrink-0" />
-                <span className="truncate">{selectedCategoryTitle}</span>
-              </div>
-              <ChevronDown
-                size={16}
-                className={cn('shrink-0 transition-transform', showCategories && 'rotate-180')}
-              />
-            </button>
-
-            {/* Categories Menu - use max-height so it's not clipped by scale-y-0 on mobile */}
-            <div
-              className={cn(
-                'absolute top-full left-0 w-full md:w-full bg-white border shadow-lg z-100 transition-all duration-200 origin-top overflow-y-auto',
-                showCategories
-                  ? 'max-h-[60vh] md:max-h-[70vh] opacity-100 visible'
-                  : 'max-h-0 opacity-0 invisible pointer-events-none border-transparent',
-              )}
-              style={showCategories ? undefined : { overflow: 'hidden' }}
-            >
-              <ul className="py-2">
-                <li className="px-4 py-2 hover:bg-muted transition-colors border-b border-border/50">
-                  <Link
-                    href="/shop"
-                    className="block w-full text-sm font-bold text-primary"
-                    onClick={() => setShowCategories(false)}
-                  >
-                    All Categories
-                  </Link>
-                </li>
-                {categories && categories.length > 0 ? (
-                  categories.map((cat) => (
-                    <li
-                      key={cat.id}
-                      className="px-4 py-2 hover:bg-muted transition-colors border-b last:border-none border-border/50"
-                    >
-                      <Link
-                        href={`/shop?category=${cat.id}`}
-                        className="block w-full text-sm font-medium"
-                        onClick={() => setShowCategories(false)}
-                      >
-                        {cat.title}
-                      </Link>
-                    </li>
-                  ))
-                ) : (
-                  <>
-                    {[
-                      'Plant Stands',
-                      'Outdoor Pots',
-                      'Lighting',
-                      'Fresh Flowers',
-                      'House Plants',
-                    ].map((cat) => (
-                      <li
-                        key={cat}
-                        className="px-4 py-2 hover:bg-muted transition-colors border-b last:border-none border-border/50"
-                      >
-                        <Link href="/shop" className="block w-full text-sm font-medium">
-                          {cat}
-                        </Link>
-                      </li>
-                    ))}
-                  </>
-                )}
-              </ul>
-            </div>
-          </div>
-
-          {/* Main Navigation - hidden on mobile (links are in MobileMenu), visible on desktop */}
-          <nav className="hidden md:block grow md:ml-6 lg:ml-8">
-            <ul className="flex items-center gap-4 lg:gap-8 whitespace-nowrap py-2 md:py-0">
-              {navItems &&
-                navItems.map((item, i: number) => (
-                  <li key={item.id || i}>
-                    <CMSLink
-                      {...item.link}
-                      className={cn(
-                        'navLink py-4 block text-sm font-bold uppercase tracking-wider hover:text-primary transition-colors relative',
-                        pathname === item.link.url && 'text-primary active',
-                      )}
-                    />
-                  </li>
-                ))}
-            </ul>
-          </nav>
-
-          {/* Help / Phone - compact padding */}
-          <div className="hidden md:flex items-center justify-end">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5">
-              <Phone size={18} strokeWidth={1.8} className="text-primary shrink-0" />
-              <div className="flex flex-col leading-tight">
-                <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Call us 24/7
-                </span>
-                <span className="mt-0.5 text-sm font-bold tracking-[0.03em] text-primary">
-                  {formattedContactNumber}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Categories + Nav bar — desktop only; mobile nav lives in MobileMenu */}
+      <CategoriesNavBar
+        categories={categories}
+        navItems={navItems ?? []}
+        pathname={pathname}
+        selectedCategoryTitle={selectedCategoryTitle}
+      />
     </header>
   )
 }

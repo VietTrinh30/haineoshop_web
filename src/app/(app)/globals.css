@@ -44,7 +44,7 @@
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
   --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope);
 }
 
 @layer utilities {
@@ -106,11 +106,8 @@
     content: '';
     position: fixed;
     inset: 0;
-    background-image: linear-gradient(
-        to right,
-        rgba(0, 0, 0, 0.06) 1px,
-        transparent 1px
-      ),
+    background-image:
+      linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
     background-size: 80px 80px;
     z-index: -1; /* Behind all content so touch/click work on mobile */
@@ -137,7 +134,7 @@
   --border: oklch(90% 0 0deg);
   --input: oklch(90% 0 0deg);
   --ring: #e963a6;
-  --radius: 0rem;
+  --radius: 0.5rem;
   --success: oklch(78% 0.08 140deg);
   --warning: oklch(89% 0.1 75deg);
   --error: oklch(75% 0.15 25deg);

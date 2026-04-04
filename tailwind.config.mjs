@@ -104,9 +104,10 @@ const config = {
       }),
       fontFamily: {
         mono: ['var(--font-geist-mono)'],
-        sans: ['var(--font-rubik)', 'sans-serif'],
-        heading: ['var(--font-lora)', 'serif'],
-        body: ['var(--font-rubik)', 'sans-serif'],
+        sans: ['var(--font-manrope)', 'sans-serif'],
+        display: ['var(--font-manrope)', 'sans-serif'],
+        heading: ['var(--font-manrope)', 'sans-serif'],
+        body: ['var(--font-manrope)', 'sans-serif'],
       },
       keyframes: {
         fadeIn: {

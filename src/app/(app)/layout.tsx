@@ -7,17 +7,49 @@ import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { GeistMono } from 'geist/font/mono'
-import { Lora, Rubik } from 'next/font/google'
+import localFont from 'next/font/local'
 import './globals.css'
 
-const rubik = Rubik({
-  subsets: ['latin'],
-  variable: '--font-rubik',
-})
-
-const lora = Lora({
-  subsets: ['latin'],
-  variable: '--font-lora',
+const manrope = localFont({
+  src: [
+    {
+      path: '../../../public/fonts/Manrope-ExtraLight.ttf',
+      weight: '200',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Manrope-Light.ttf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Manrope-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Manrope-Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Manrope-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Manrope-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../../public/fonts/Manrope-ExtraBold.ttf',
+      weight: '800',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-manrope',
+  display: 'swap',
 })
 
 /* const { SITE_NAME, TWITTER_CREATOR, TWITTER_SITE } = process.env
@@ -52,7 +84,7 @@ const debugLayout = process.env.NEXT_PUBLIC_DEBUG_LAYOUT === 'true'
 export default async function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
-      className={[rubik.variable, lora.variable, GeistMono.variable].filter(Boolean).join(' ')}
+      className={[manrope.variable, GeistMono.variable].filter(Boolean).join(' ')}
       lang="en"
       suppressHydrationWarning
     >
