@@ -85,7 +85,7 @@ export function HeaderClient({ header, categories }: Props) {
   return (
     <header className="relative z-50 w-full bg-white text-black" data-theme="light">
       {/* Top Bar */}
-      <div className="bg-white border-b py-2 hidden md:block debug-outline debug-grid">
+      {/* <div className="bg-white border-b py-2 hidden md:block debug-outline debug-grid">
         <div className="container debug-container flex justify-between items-center text-sm font-light text-muted-foreground">
           <div>{topBarContent || 'Free Delivery: Take advantage of our limited time offer!'}</div>
           <div className="flex gap-6">
@@ -124,11 +124,11 @@ export function HeaderClient({ header, categories }: Props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Middle Header - higher z so search dropdown can overlap nav bar */}
       <div className="relative z-60 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
-        <div className="border-b border-primary/10 px-4 md:px-20 lg:px-40 py-3">
+        <div className="border-b border-[#E963A6]/10 px-4 md:px-20 lg:px-40 py-3">
           <div className="flex items-center justify-between gap-4 max-w-[1280px] mx-auto">
             {/* Left: Logo + Search */}
             <div className="flex items-center gap-6">
@@ -197,8 +197,8 @@ export function HeaderClient({ header, categories }: Props) {
         className={cn(
           'relative z-50 transition-all duration-300 overflow-visible py-1 md:py-2',
           isSticky
-            ? 'fixed top-0 left-0 right-0 shadow-md translate-y-0 bg-white border-y'
-            : 'bg-white border-y',
+            ? 'fixed top-0 left-0 right-0 shadow-md translate-y-0 bg-white border-y border-[#E963A6]/10'
+            : 'bg-white border-y border-[#E963A6]/10',
         )}
       >
         <div className="container debug-container flex flex-row items-center justify-between gap-2 md:gap-0">
