@@ -3,19 +3,18 @@
 import { Cart } from '@/components/Cart'
 import { OpenCartButton } from '@/components/Cart/OpenCart'
 import { CMSLink } from '@/components/Link'
-import { Price } from '@/components/Price'
 import Link from 'next/link'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 
 import { Category, Header } from '@/payload-types'
 import { useTheme } from '@/providers/Theme'
 import { cn } from '@/utilities/cn'
-import { ChevronDown, Heart, Menu as MenuIcon, Phone, User } from 'lucide-react'
+import { ChevronDown, Menu as MenuIcon, Phone } from 'lucide-react'
 import { usePathname, useSearchParams } from 'next/navigation'
 
 import { MobileMenu } from '@/components/Header/MobileMenu'
 import { Search } from '@/components/layout/search/Search'
-import { useWishlist } from '@/hooks/useWishlist'
+import { useAuth } from '@/providers/Auth'
 
 type Props = {
   header: Header
@@ -31,7 +30,7 @@ export function HeaderClient({ header, categories }: Props) {
   const [isSticky, setIsSticky] = useState(false)
   const [showCategories, setShowCategories] = useState(false)
   const { theme = 'light', setTheme } = useTheme()
-  const { wishlistIds } = useWishlist()
+  const { user } = useAuth()
 
   const selectedCategoryTitle = useMemo(() => {
     if (!currentCategoryId) return 'Categories'
@@ -128,40 +127,67 @@ export function HeaderClient({ header, categories }: Props) {
       </div>
 
       {/* Middle Header - higher z so search dropdown can overlap nav bar */}
-      <div className="relative z-60 bg-white py-6 md:py-10 border-b md:border-none debug-outline debug-grid">
-        <div className="container debug-container flex items-stretch justify-between gap-4 md:gap-8">
-          {/* Mobile Menu Button - Left on mobile; z-10 + min size so tap always hits */}
-          <div className="md:hidden flex-1 min-w-0 flex items-center shrink-0 relative z-10">
-            <Suspense fallback={null}>
-              <MobileMenu menu={navItems} />
-            </Suspense>
-          </div>
+      <div className="relative z-60 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
+        <div className="border-b border-primary/10 px-4 md:px-20 lg:px-40 py-3">
+          <div className="flex items-center justify-between gap-4 max-w-[1280px] mx-auto">
+            {/* Left: Logo + Search */}
+            <div className="flex items-center gap-6">
+              {/* Mobile Menu Button - only on mobile */}
+              <div className="md:hidden flex items-center">
+                <Suspense fallback={null}>
+                  <MobileMenu menu={navItems} />
+                </Suspense>
+              </div>
 
-          {/* Logo - Center on mobile, left on desktop */}
-          <Link
-            href="/"
-            className="shrink-0 flex-1 md:flex-none flex justify-center md:justify-start"
-          >
-            <h1 className="text-4xl font-bold tracking-tighter text-foreground">
-              LUKANI<span className="text-primary">.</span>
-            </h1>
-          </Link>
+              <a className="flex items-center gap-2" href="/">
+                {/* Logo image placeholder — replace src when asset is ready */}
+                <div className="size-10 flex items-center justify-center rounded-full bg-primary/10 overflow-hidden">
+                  <span className="text-primary/40 text-[10px] font-bold uppercase tracking-tight">
+                    Logo
+                  </span>
+                </div>
+                <h2 className="text-slate-900 dark:text-white text-xl font-extrabold leading-tight tracking-tight">
+                  Hai Neo <span className="text-primary">Shop</span>
+                </h2>
+              </a>
 
-          {/* Search Bar - Hidden on Mobile */}
-          <div className="hidden md:flex grow max-w-2xl mx-12">
-            <Search className="rounded-none border-2 border-primary" categories={categories} />
-          </div>
+              {/* Desktop Search — shared Search component (shop q/category + debounce) */}
+              <div className="hidden md:block w-64 lg:w-96 shrink-0">
+                <Suspense fallback={null}>
+                  <Search variant="header" categories={categories} className="w-full" />
+                </Suspense>
+              </div>
+            </div>
 
-          {/* Icons (account & cart temporarily hidden) */}
-          <div className="self-stretch flex items-center gap-4 md:gap-7 flex-1 md:flex-none justify-end">
-            <Link href="/wishlist" className="hover:text-primary transition-colors relative">
-              <Heart size={26} strokeWidth={1.5} />
-              {wishlistIds.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold">
-                  {wishlistIds.length}
-                </span>
-              )}
-            </Link>
+            {/* Right: Action icons — user + cart only (wishlist hidden per design) */}
+            <div className="flex items-center gap-3 md:gap-6">
+              <Link
+                href={user ? '/account' : '/login'}
+                className="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200"
+                aria-label={user ? 'Open account' : 'Log in'}
+              >
+                <img
+                  src="/media/icons/person.svg"
+                  alt=""
+                  width={26}
+                  height={26}
+                  className="size-6 shrink-0"
+                  aria-hidden
+                />
+              </Link>
+
+              <Cart
+                renderTrigger={({ quantity }) => (
+                  <button
+                    type="button"
+                    className="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200"
+                    aria-label="Open cart"
+                  >
+                    <OpenCartButton quantity={quantity} />
+                  </button>
+                )}
+              />
+            </div>
           </div>
         </div>
       </div>
