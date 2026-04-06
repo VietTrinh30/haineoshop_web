@@ -1,0 +1,285 @@
+---
+description: Standard docs folder for Next.js feature modules. Apply when creating or updating docs under src/features/{feature_name}/docs/. Requires six core files (plus optional TestingStrategy) focused on developer implementation—Architecture, API, Conventions, DataModel, NonFunctionalRequirements, and Tailwind/RSC boundaries.
+globs:
+alwaysApply: false
+---
+
+# Feature Module Documentation Structure (Next.js + Tailwind)
+
+## Critical Rules
+
+- **MANDATORY**: Feature module documentation lives at `src/features/{feature_name}/docs/`
+- **REQUIRED**: Each documented feature has these **six core files** (plus optional
+  `TestingStrategy.md`)
+- **ENFORCE**: Each file follows its defined purpose; avoid duplicating product specs or
+  design dumps unless they unblock implementation
+- **UPDATE**: When feature code, routes, or contracts change, update the relevant docs in
+  the same PR or immediately after
+
+## Required Documents
+
+| File                           | Purpose                                                 | Priority  |
+| ------------------------------ | ------------------------------------------------------- | --------- |
+| `README.md`                    | Overview, setup, usage, links to sibling docs           | Required  |
+| `Architecture.md`              | Routes, RSC vs client boundaries, data flow, ownership  | Required  |
+| `API.md`                       | Public exports—components, hooks, actions, schemas      | Required  |
+| `Conventions.md`               | Module-specific TS/React/Tailwind and file layout rules | Important |
+| `DataModel.md`                 | Types, Zod schemas, DTOs, API shapes                    | Important |
+| `NonFunctionalRequirements.md` | Performance, security, a11y, SEO, env                   | Important |
+| `TestingStrategy.md`           | Vitest/RTL, Storybook, e2e or manual smoke              | Optional  |
+
+## File Structure
+
+```
+src/features/{feature_name}/docs/
+├── README.md
+├── Architecture.md
+├── API.md
+├── Conventions.md
+├── DataModel.md
+├── NonFunctionalRequirements.md
+└── TestingStrategy.md (optional)
+```
+
+`{feature_name}` uses **kebab-case** and matches the feature folder under `src/features/`
+(e.g. `voucher`, `wallet`).
+
+## Document Templates
+
+### README.md
+
+```markdown
+# {ModuleName} Feature
+
+## Overview
+
+What this feature does, main user flows, and how it maps to `src/features/{feature}/`.
+
+## Setup
+
+Environment variables (`NEXT_PUBLIC_*` vs server-only), flags, and external services.
+
+## Usage
+
+Import examples for public components, hooks, and Server Actions (ts/tsx).
+
+## Related Docs
+
+Links to Architecture.md, API.md, Conventions.md, DataModel.md,
+NonFunctionalRequirements.md, TestingStrategy.md.
+```
+
+### Architecture.md
+
+```markdown
+# {ModuleName} Architecture
+
+## App Router integration
+
+- Route segments under `src/app/...` that compose this feature
+- Dynamic segments, layouts, loading.tsx / error.tsx if owned by the feature
+
+## Server vs client
+
+- Server Components: data fetching, static output, secrets
+- Client components (`'use client'`): interactivity, browser APIs, local state
+- Where the boundary sits and which props are serializable
+
+## Data flow
+
+- Server Actions, Route Handlers (`route.ts`), React Query (if used), and cache/revalidate
+- Sequence from request → validation → external API → UI
+
+## Key building blocks
+
+- Notable components, hooks, stores, and server modules and their roles
+
+## Boundaries
+
+- What this feature owns vs shared `src/components/` or other features
+```
+
+### API.md
+
+```markdown
+# {ModuleName} Public API
+
+## Exported components
+
+### ComponentName
+
+- Purpose, main props (TypeScript), usage notes
+
+## Hooks & client utilities
+
+### useFeatureX
+
+- Contract, when to use, side effects
+
+## Server Actions & server-only helpers
+
+### actionName
+
+- Input validation (e.g. Zod), auth expectations, return shape, errors
+
+## Route Handlers (if any)
+
+- Method, path, request/response types
+
+## Schemas & parsers
+
+- Zod schemas and inferred types consumed outside the feature
+```
+
+### Conventions.md
+
+```markdown
+# {ModuleName} Conventions
+
+## Project alignment
+
+- Next.js App Router patterns (RSC first, minimal `'use client'`)
+- TypeScript strictness, `import` style matching the repo
+
+## File & naming
+
+- Directories: kebab-case (`components/`, `actions/`)
+- Components: PascalCase files when exporting components
+- Colocation: keep feature-private modules next to consumers when small
+
+## Tailwind & UI
+
+- Design tokens / `@theme`, `cn()` / `cva` patterns used in this feature
+- Responsive and focus-visible requirements
+
+## State & data
+
+- Zustand, React Query, or URL state—where each is allowed
+- Error and empty-state patterns
+```
+
+### DataModel.md
+
+```markdown
+# Data Model
+
+## Domain types
+
+### TypeName
+
+- Fields, invariants, where defined (`types.ts`, Zod `infer`)
+
+## Zod schemas
+
+### schemaName
+
+- Validation rules, `.transform`, error messages for UX
+
+## API DTOs
+
+- Request/response shapes from backend; mapping to UI models
+
+## Relationships
+
+- Cross-feature or shared types; single source of truth
+```
+
+### NonFunctionalRequirements.md
+
+```markdown
+# Non-Functional Requirements
+
+## Performance
+
+- Core Web Vitals targets, LCP image strategy (`next/image`), bundle impact of client
+  islands
+
+## Caching & data
+
+- `fetch` cache, `revalidatePath` / `revalidateTag`, stale times if using React Query
+
+## Security
+
+- Server-only secrets, CSRF expectations for actions, input validation surface
+
+## Accessibility & SEO
+
+- Landmarks, labels, focus order; metadata and OG when the feature owns a route
+
+## Compatibility
+
+- Supported browsers; mobile-first layout assumptions
+
+## Observability
+
+- Client vs server logging; what must never be logged (PII, tokens)
+```
+
+### TestingStrategy.md
+
+```markdown
+# Testing Strategy
+
+## Unit tests
+
+- Pure helpers, Zod parsers, action validation logic (Vitest)
+
+## Component tests
+
+- React Testing Library: critical UI states and interactions
+
+## Storybook
+
+- Stories for variants, a11y states, and visual regression if used
+
+## Integration / e2e
+
+- Critical paths (optional Playwright or documented manual smoke)
+
+## Coverage goals
+
+- Must-cover flows and acceptable gaps
+```
+
+## Examples
+
+<example>
+User: "Create docs for the wallet feature"
+
+Correct action:
+
+1. Create `src/features/wallet/docs/`
+2. Add all six required files (plus `TestingStrategy.md` if tests are non-trivial)
+3. Fill with wallet-specific routes, actions, types, and Tailwind touchpoints
+4. Link every doc from `README.md`
+5. Keep content actionable for developers shipping the feature
+   </example>
+
+<example type="invalid">
+User: "Create docs for the wallet feature"
+
+Incorrect action:
+
+- Only `README.md` without Architecture/API
+- Wrong names (`architecture.md` instead of `Architecture.md`)
+- Docs under `lib/src/modules/...` or outside `src/features/wallet/docs/`
+- Skipping `Architecture.md` or `API.md`
+- Replacing developer docs with product backlog or raw Figma exports only
+  </example>
+
+## Quality Checklist
+
+Before finalizing feature docs:
+
+- [ ] All six core files exist under `src/features/{feature}/docs/`
+- [ ] File names match: `README.md`, `Architecture.md`, `API.md`, `Conventions.md`,
+      `DataModel.md`, `NonFunctionalRequirements.md`
+- [ ] Optional: `TestingStrategy.md` when testing is non-obvious
+- [ ] `README.md` links to all sibling docs
+- [ ] `Architecture.md` covers RSC/client split and data flow into the UI
+- [ ] `API.md` lists public exports (components, hooks, actions, schemas)
+- [ ] `Conventions.md` states module-specific Next/Tailwind/TS patterns
+- [ ] `DataModel.md` matches current Zod/types and API contracts
+- [ ] `NonFunctionalRequirements.md` covers performance, security, a11y, and env
+- [ ] Code samples use `typescript` / `tsx` and match the repo
+- [ ] Cross-references between docs are valid (no broken relative links)

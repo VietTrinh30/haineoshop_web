@@ -30,6 +30,14 @@ export const GeneralSettings: GlobalConfig = {
     read: () => true,
     update: adminOnly,
   },
+  hooks: {
+    afterChange: [
+      async () => {
+        const { revalidateTag } = await import('next/cache')
+        revalidateTag('global_general-settings')
+      },
+    ],
+  },
   fields: [
     {
       name: 'newProductDays',
@@ -81,6 +89,15 @@ export const GeneralSettings: GlobalConfig = {
       validate: optionalUrlValidation,
       admin: {
         description: 'TikTok page URL (optional).',
+      },
+    },
+    {
+      name: 'shopeePageLink',
+      type: 'text',
+      required: false,
+      validate: optionalUrlValidation,
+      admin: {
+        description: 'Shopee store URL (optional).',
       },
     },
   ],

@@ -41,4 +41,5 @@ export const generalSettingsData = {
   facebookPageLink: 'https://www.facebook.com/lukani',
   instagramPageLink: 'https://www.instagram.com/lukani',
   tiktokPageLink: 'https://www.tiktok.com/@lukani',
+  shopeePageLink: 'https://shopee.vn/lukani',
 }

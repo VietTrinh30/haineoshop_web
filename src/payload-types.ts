@@ -3103,6 +3103,10 @@ export interface GeneralSetting {
    * TikTok page URL (optional).
    */
   tiktokPageLink?: string | null;
+  /**
+   * Shopee store URL (optional).
+   */
+  shopeePageLink?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3252,6 +3256,7 @@ export interface GeneralSettingsSelect<T extends boolean = true> {
   facebookPageLink?: T;
   instagramPageLink?: T;
   tiktokPageLink?: T;
+  shopeePageLink?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

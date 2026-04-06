@@ -1,0 +1,52 @@
+---
+description: Ensures all code comments and docstrings in TypeScript/TSX/JS/CSS are written in English for consistency and collaboration.
+globs:
+alwaysApply: false
+---
+
+# English Comments Always
+
+## Critical Rules
+
+- **ALL code comments MUST be written in English only**
+- Applies to:
+  - Inline comments (`//`)
+  - Block comments (`/* */`)
+  - JSDoc on functions, components, and types (`/** */`)
+  - TODO / FIXME / NOTE comments
+  - Explanatory comments in CSS, Tailwind `@apply` blocks, and config when they document intent
+- **Do not** use Vietnamese, Chinese, Japanese, or other non-English languages in comments
+- Use clear, concise technical English; grammar should be professional
+
+## Examples
+
+<example>
+  // Calculate the total price including tax
+  const totalPrice = price * (1 + taxRate);
+
+  /**
+   * Fetches the current user from the API.
+   * @throws {ApiError} When the session is invalid or the request fails.
+   */
+  async function fetchUser(userId: string): Promise<User> {
+    // ...
+  }
+
+  // TODO: Add retry with exponential backoff for transient failures
+  // FIXME: Discount codes are not applied in this calculation
+  // NOTE: This handler runs on the server only (RSC / Route Handler)
+</example>
+
+<example type="invalid">
+  // Tính tổng giá bao gồm thuế
+  const totalPrice = price * (1 + taxRate);
+
+  /**
+   * Lấy dữ liệu người dùng từ API.
+   */
+  async function fetchUser(userId: string): Promise<User> {
+    // ...
+  }
+
+  // TODO: Xử lý lỗi khi mạng bị lỗi
+</example>

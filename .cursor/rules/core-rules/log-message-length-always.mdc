@@ -1,0 +1,70 @@
+---
+description: Enforces ≤80 characters per line for log and diagnostic output in TypeScript/Next.js code (console, structured loggers, server logs).
+globs:
+alwaysApply: true
+---
+
+# Log Message Length Limit
+
+## Critical Rules
+
+- **MANDATORY**: Each line of a log message must not exceed 80 characters
+- **SCOPE**: Applies to `console.log`, `console.info`, `console.warn`, `console.error`,
+  `console.debug`, and any project logger (e.g. `logger.info`, `pino`, `winston`) used in
+  app, Server Components, Route Handlers, and Server Actions
+- **REQUIRED**: Break long messages across lines using adjacent string literals or
+  template literals split at natural boundaries
+- **ENFORCE**: Every physical line inside the message (after concatenation) should be ≤ 80 chars
+- **CHECK**: Verify line length before committing; avoid shipping noisy logs in production UI paths
+
+## Examples
+
+<example>
+  // ✅ CORRECT: Each string literal line ≤ 80 chars
+  console.info(
+    '[MyService] Processing request: ' +
+      `userId=${userId}, action=${action}`,
+  );
+
+  console.warn(
+    '[MyService] Failed to process request: ' +
+      `error=${String(error)}, userId=${userId}`,
+  );
+
+  console.error(
+    '[MyService] Critical error:',
+    error instanceof Error ? error.message : error,
+  );
+</example>
+
+<example type="invalid">
+  // ❌ INCORRECT: single literal exceeds 80 characters
+  console.log(`[MyService] Processing request with userId=${userId} and action=${action} and extra context`);
+
+  // ❌ INCORRECT: one long line even if built from variables
+  console.warn(`Failed: error=${error} userId=${userId} requestId=${requestId} path=${path}`);
+</example>
+
+## Best Practices
+
+1. **Split at commas, colons, or clause boundaries** so grep and log viewers stay readable
+2. **Prefer structured context** in a second argument when the runtime supports it
+   (e.g. `console.error('...', { userId, code })`) while keeping the first string line short
+3. **Server vs client**: avoid logging secrets; redact tokens and PII
+4. **Production**: use env-gated or level-based logging; do not rely on `console` alone for observability
+
+## Format Pattern
+
+```typescript
+console.info(
+  '[ClassName] Short description: ' + `param1=${value1}, param2=${value2}`,
+);
+```
+
+**Pattern breakdown**
+
+- Prefix: `[ClassName]` — typically 15–25 characters
+- Description: short action — ~20–30 characters per fragment
+- Parameters: split across lines with `+` or multi-line template segments
+
+**Total per line**: ≤ 80 characters

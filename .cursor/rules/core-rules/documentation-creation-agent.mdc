@@ -1,0 +1,155 @@
+---
+description: Standard for creating and maintaining feature documentation in Next.js + Tailwind projects (feature-scoped docs, checklists, phased guides).
+globs:
+alwaysApply: false
+---
+
+# Documentation Creation Rule
+
+## Critical Rules
+
+### When to Create Documentation
+
+Create documentation when:
+
+- Implementing a new complex route, feature slice, or cross-cutting flow
+- Fixing a significant issue that needs a tracked, multi-step resolution
+- The user explicitly asks for docs for a component or feature
+- A feature has known limitations or follow-ups that must stay visible to the team
+
+### Document Set (Complex Features)
+
+For **large** features, prefer **three** coordinated artifacts:
+
+1. **Main doc** — `{COMPONENT_NAME}.md`: purpose, status, requirements, links
+2. **Checklist** — `{COMPONENT_NAME}_CHECKLIST.md`: tasks with checkboxes
+3. **Phase guides** — `{COMPONENT_NAME}_PHASE_{N}.md`: step-by-step work per phase
+
+For **feature modules** aligned with the repo convention, you may instead use the
+six-file set under `docs/` (see `.cursor/rules/module-docs-structure-agent.mdc`):
+`README.md`, `Architecture.md`, `API.md`, `Conventions.md`, `DataModel.md`,
+`NonFunctionalRequirements.md`, optional `TestingStrategy.md`.
+
+### Naming Conventions
+
+- **Main / checklist / phases**: `{COMPONENT_NAME}.md`, `{COMPONENT_NAME}_CHECKLIST.md`,
+  `{COMPONENT_NAME}_PHASE_{N}.md` — UPPERCASE_WITH_UNDERSCORES
+- **Examples**: `VOUCHER_CHECKOUT.md`, `VOUCHER_CHECKOUT_CHECKLIST.md`,
+  `VOUCHER_CHECKOUT_PHASE_1.md`
+
+### Location
+
+- **Feature-scoped** (recommended for this codebase):  
+  `src/features/{feature_name}/docs/`
+- **App-wide** guides: `docs/` at repository root when the topic is not owned by one feature
+
+### Main Documentation Structure
+
+**File**: `{COMPONENT_NAME}.md`
+
+**Required sections**
+
+1. **Maintenance warning** (mandatory):
+
+   ```markdown
+   > **Important**: When changing `{ComponentName}` or related code, update this file,
+   > `{COMPONENT_NAME}_CHECKLIST.md`, phase guides (`{COMPONENT_NAME}_PHASE_*.md`),
+   > and any linked feature docs under `src/features/.../docs/`.
+   ```
+
+2. **Overview** — what the feature is and who uses it
+3. **Purpose / problem** — current behavior vs desired behavior
+4. **Implementation status** — done, in progress, blocked
+5. **Requirements** — functional and non-functional (a11y, performance, SEO)
+6. **Phases** — list with links to phase guides (if used)
+7. **Related files** — key routes, components, Server Actions, API clients
+8. **References** — checklists, ADRs, Figma, tickets
+
+**Next.js-specific sections** (add when relevant)
+
+- **Routing**: App Router segments (`app/...`), dynamic params, middleware
+- **Data**: Server Components vs Server Actions vs Route Handlers; caching tags if used
+- **UI**: shared components, Tailwind patterns, responsive breakpoints
+- **Env**: public vs server-only variables (`NEXT_PUBLIC_*`)
+
+### Checklist Structure
+
+**File**: `{COMPONENT_NAME}_CHECKLIST.md`
+
+- Same maintenance warning as the main doc
+- Overview and tracking intent
+- Phases or workstreams with `- [ ]` items, file paths, owners if known
+- Links to phase guides and main doc
+
+### Phase Guide Structure
+
+**File**: `{COMPONENT_NAME}_PHASE_{N}.md`
+
+- Maintenance warning
+- Goals and prerequisites
+- Steps with paths under `src/` (`app/`, `features/`, `components/`)
+- Before/after snippets with language tags: `typescript`, `tsx`, `bash`, `markdown`
+- Verification (manual test, `pnpm lint`, Storybook/Vitest if applicable)
+- Next phase link
+
+### Phase Guidelines
+
+- Phases should describe **deliverable capabilities**, not one-off bugfix micro-steps
+- Bundle setup and bugfix sweeps into a single **Setup / hardening** phase when needed
+- Example progression: core UI → data wiring → actions/API → error & empty states → a11y/SEO → tests
+
+### Code Examples in Docs
+
+- Include file paths; approximate line numbers when helpful
+- Mark incorrect vs intended with clear labels (not emoji if your pipeline forbids it)
+- Use ```tsx / ```ts for React and TypeScript samples
+
+### Documentation Updates (Mandatory Triggers)
+
+Update docs when:
+
+- Behavior, routes, or public API of the feature changes
+- New env vars or contracts with backend change
+- Checklist items complete or scope shifts
+
+**Process**
+
+1. Refresh main doc status and requirements
+2. Tick checklist items; add new items for discovered work
+3. Adjust phase guides if steps change
+4. Update `README.md` in the same `docs/` folder with links to new files
+
+## File Organization Examples
+
+**Phased feature docs**
+
+```
+src/features/{feature_name}/docs/
+├── README.md
+├── {COMPONENT_NAME}.md
+├── {COMPONENT_NAME}_CHECKLIST.md
+├── {COMPONENT_NAME}_PHASE_1.md
+└── {COMPONENT_NAME}_PHASE_2.md
+```
+
+**Six-file module docs** (developer-focused)
+
+```
+src/features/{feature_name}/docs/
+├── README.md
+├── Architecture.md
+├── API.md
+├── Conventions.md
+├── DataModel.md
+├── NonFunctionalRequirements.md
+└── TestingStrategy.md
+```
+
+## Quality Checklist
+
+- [ ] Naming uses UPPERCASE_WITH_UNDERSCORES for phased set (or PascalCase files for six-file set)
+- [ ] Maintenance warning appears in each authored doc
+- [ ] Next.js concerns (RSC boundaries, actions, routes) covered when applicable
+- [ ] Tailwind / component reuse noted where UI is non-trivial
+- [ ] Cross-links between docs are valid
+- [ ] Code blocks use correct language tags

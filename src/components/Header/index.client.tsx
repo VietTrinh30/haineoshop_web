@@ -10,7 +10,6 @@ import { Suspense, useMemo } from 'react'
 
 import { Category, Header } from '@/payload-types'
 import { useTheme } from '@/providers/Theme'
-import { ChevronDown } from 'lucide-react'
 import { usePathname, useSearchParams } from 'next/navigation'
 
 import { useAuth } from '@/providers/Auth'
