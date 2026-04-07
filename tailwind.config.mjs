@@ -1,3 +1,4 @@
+import containerQueries from '@tailwindcss/container-queries'
 import typography from '@tailwindcss/typography'
 import plugin from 'tailwindcss/plugin'
 /** @type {import('tailwindcss').Config} */
@@ -181,6 +182,7 @@ const config = {
   },
   plugins: [
     typography,
+    containerQueries,
     plugin(({ matchUtilities, theme }) => {
       matchUtilities(
         {
