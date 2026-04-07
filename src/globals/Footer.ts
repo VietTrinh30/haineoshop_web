@@ -18,6 +18,24 @@ export const Footer: GlobalConfig = {
         'We are a team of designers and developers that create high quality plants and flower shop themes for your business.',
     },
     {
+      name: 'location',
+      type: 'text',
+      label: 'Location',
+      defaultValue: 'Your store location',
+    },
+    {
+      name: 'contactNumber',
+      type: 'text',
+      label: 'Contact Number',
+      defaultValue: '+01 23456789',
+    },
+    {
+      name: 'email',
+      type: 'email',
+      label: 'Email',
+      defaultValue: 'contact@example.com',
+    },
+    {
       name: 'sections',
       type: 'array',
       label: 'Column Sections',

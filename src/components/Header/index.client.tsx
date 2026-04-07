@@ -11,7 +11,7 @@ import { Suspense, useMemo } from 'react'
 import { Category, Header } from '@/payload-types'
 import { useTheme } from '@/providers/Theme'
 import { usePathname, useSearchParams } from 'next/navigation'
-
+import { ChevronDown } from 'lucide-react'
 import { useAuth } from '@/providers/Auth'
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 }
 
 export function HeaderClient({ header, categories }: Props) {
-  const { navItems = [], topBarContent, contactNumber } = header
+  const { navItems = [], topBarContent } = header
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const currentCategoryId = searchParams.get('category')
@@ -40,40 +40,40 @@ export function HeaderClient({ header, categories }: Props) {
     return 'Light'
   }, [theme])
 
-  const formattedContactNumber = useMemo(() => {
-    const raw = (contactNumber || '+0123456789').trim()
-    const digits = raw.replace(/\D/g, '')
+  // const formattedContactNumber = useMemo(() => {
+  //   const raw = (contactNumber || '+0123456789').trim()
+  //   const digits = raw.replace(/\D/g, '')
 
-    if (!digits) return raw
+  //   if (!digits) return raw
 
-    // Vietnam: local number starting with 0, e.g. 0388291140 -> (+84)388 291 140
-    if (digits.startsWith('0') && digits.length >= 9) {
-      const rest = digits.slice(1)
-      const restFormatted = rest.replace(/(\d{3})(?=\d)/g, '$1 ').trim()
+  //   // Vietnam: local number starting with 0, e.g. 0388291140 -> (+84)388 291 140
+  //   if (digits.startsWith('0') && digits.length >= 9) {
+  //     const rest = digits.slice(1)
+  //     const restFormatted = rest.replace(/(\d{3})(?=\d)/g, '$1 ').trim()
 
-      return `(+84)${restFormatted}`
-    }
+  //     return `(+84)${restFormatted}`
+  //   }
 
-    // Vietnam: already with country code, e.g. 84388291140 -> (+84)388 291 140
-    if (digits.startsWith('84') && digits.length > 2) {
-      const rest = digits.slice(2)
-      const restFormatted = rest.replace(/(\d{3})(?=\d)/g, '$1 ').trim()
+  //   // Vietnam: already with country code, e.g. 84388291140 -> (+84)388 291 140
+  //   if (digits.startsWith('84') && digits.length > 2) {
+  //     const rest = digits.slice(2)
+  //     const restFormatted = rest.replace(/(\d{3})(?=\d)/g, '$1 ').trim()
 
-      return `(+84)${restFormatted}`
-    }
+  //     return `(+84)${restFormatted}`
+  //   }
 
-    // Generic international: +CC XXXX XXXX...
-    const country = digits.slice(0, 2)
-    const rest = digits.slice(2)
-    const restFormatted = rest.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
+  //   // Generic international: +CC XXXX XXXX...
+  //   const country = digits.slice(0, 2)
+  //   const rest = digits.slice(2)
+  //   const restFormatted = rest.replace(/(\d{4})(?=\d)/g, '$1 ').trim()
 
-    return `+${country}${restFormatted ? ` ${restFormatted}` : ''}`
-  }, [contactNumber])
+  //   return `+${country}${restFormatted ? ` ${restFormatted}` : ''}`
+  // }, [contactNumber])
 
   return (
     <header className="relative z-50 w-full bg-white text-black" data-theme="light">
       {/* Top Bar */}
-      {/* <div className="bg-white border-b py-2 hidden md:block debug-outline debug-grid">
+      <div className="bg-white border-b py-2 hidden md:block debug-outline debug-grid">
         <div className="container debug-container flex justify-between items-center text-sm font-light text-muted-foreground">
           <div>{topBarContent || 'Free Delivery: Take advantage of our limited time offer!'}</div>
           <div className="flex gap-6">
@@ -112,7 +112,7 @@ export function HeaderClient({ header, categories }: Props) {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
 
       {/* Middle Header - higher z so search dropdown can overlap nav bar */}
       <div className="relative z-60 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">

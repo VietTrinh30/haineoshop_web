@@ -8,6 +8,9 @@ export const headerData = {
 export const footerData = {
   brandDescription:
     'We are a team of designers and developers that create high quality plants and flower shop themes for your business.',
+  location: 'Your store location',
+  contactNumber: '+01 23456789',
+  email: 'contact@example.com',
   sections: [
     {
       title: 'Information',

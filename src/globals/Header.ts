@@ -17,12 +17,6 @@ export const Header: GlobalConfig = {
       defaultValue: 'Free Delivery: Take advantage of our limited time offer!',
     },
     {
-      name: 'contactNumber',
-      type: 'text',
-      label: 'Contact Number',
-      defaultValue: '+01 23456789',
-    },
-    {
       name: 'navItems',
       type: 'array',
       fields: [

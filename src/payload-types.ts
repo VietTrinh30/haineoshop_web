@@ -2928,7 +2928,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Header {
   id: number;
   topBarContent?: string | null;
-  contactNumber?: string | null;
   navItems?:
     | {
         link: {
@@ -2969,6 +2968,9 @@ export interface Header {
 export interface Footer {
   id: number;
   brandDescription?: string | null;
+  location?: string | null;
+  contactNumber?: string | null;
+  email?: string | null;
   sections?:
     | {
         title: string;
@@ -3134,7 +3136,6 @@ export interface PayloadJobsStat {
  */
 export interface HeaderSelect<T extends boolean = true> {
   topBarContent?: T;
-  contactNumber?: T;
   navItems?:
     | T
     | {
@@ -3173,6 +3174,9 @@ export interface HeaderSelect<T extends boolean = true> {
  */
 export interface FooterSelect<T extends boolean = true> {
   brandDescription?: T;
+  location?: T;
+  contactNumber?: T;
+  email?: T;
   sections?:
     | T
     | {
