@@ -880,13 +880,10 @@ export interface ThreeItemGridBlock {
  */
 export interface ProductListingBlock {
   /**
-   * Optional short intro text shown below the section heading.
-   */
-  sectionDescription?: string | null;
-  /**
    * Main title for the product listing section.
    */
   heading: string;
+  listingMode: 'categories' | 'newProducts' | 'topSelling';
   enableSearch?: boolean | null;
   tabs?:
     | {
@@ -899,6 +896,11 @@ export interface ProductListingBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Product is new when current date - createdAt is less than this value.
+   */
+  newProductDays?: number | null;
+  modeLimit?: number | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'productListing';
@@ -2167,8 +2169,8 @@ export interface ThreeItemGridBlockSelect<T extends boolean = true> {
  * via the `definition` "ProductListingBlock_select".
  */
 export interface ProductListingBlockSelect<T extends boolean = true> {
-  sectionDescription?: T;
   heading?: T;
+  listingMode?: T;
   enableSearch?: T;
   tabs?:
     | T
@@ -2178,6 +2180,8 @@ export interface ProductListingBlockSelect<T extends boolean = true> {
         limit?: T;
         id?: T;
       };
+  newProductDays?: T;
+  modeLimit?: T;
   id?: T;
   blockName?: T;
 }

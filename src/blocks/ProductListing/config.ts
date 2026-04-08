@@ -9,14 +9,6 @@ export const ProductListing: Block = {
   },
   fields: [
     {
-      name: 'sectionDescription',
-      type: 'textarea',
-      label: 'Section description',
-      admin: {
-        description: 'Optional short intro text shown below the section heading.',
-      },
-    },
-    {
       name: 'heading',
       type: 'text',
       required: true,
@@ -27,16 +19,43 @@ export const ProductListing: Block = {
       },
     },
     {
+      name: 'listingMode',
+      type: 'select',
+      required: true,
+      defaultValue: 'categories',
+      label: 'Listing mode',
+      options: [
+        {
+          label: 'Categories',
+          value: 'categories',
+        },
+        {
+          label: 'New Products',
+          value: 'newProducts',
+        },
+        {
+          label: 'Top Selling',
+          value: 'topSelling',
+        },
+      ],
+    },
+    {
       name: 'enableSearch',
       type: 'checkbox',
       label: 'Enable search input',
       defaultValue: true,
+      admin: {
+        condition: (_, siblingData) => siblingData?.listingMode === 'categories',
+      },
     },
     {
       name: 'tabs',
       type: 'array',
       label: 'Tabs',
       minRows: 1,
+      admin: {
+        condition: (_, siblingData) => siblingData?.listingMode === 'categories',
+      },
       labels: {
         singular: 'Tab',
         plural: 'Tabs',
@@ -71,6 +90,33 @@ export const ProductListing: Block = {
           },
         },
       ],
+    },
+    {
+      name: 'newProductDays',
+      type: 'number',
+      label: 'New product days',
+      required: true,
+      min: 1,
+      admin: {
+        condition: (_, siblingData) => siblingData?.listingMode === 'newProducts',
+        description:
+          'Product is new when current date - createdAt is less than this value.',
+        step: 1,
+      },
+    },
+    {
+      name: 'modeLimit',
+      type: 'number',
+      label: 'Max products to show (up to 24)',
+      defaultValue: 24,
+      min: 1,
+      max: 24,
+      admin: {
+        condition: (_, siblingData) =>
+          siblingData?.listingMode === 'newProducts' ||
+          siblingData?.listingMode === 'topSelling',
+        step: 1,
+      },
     },
   ],
 }

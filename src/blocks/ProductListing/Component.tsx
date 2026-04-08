@@ -9,7 +9,22 @@ import { ProductListingClient } from './Component.client'
 type Props = ProductListingBlockProps
 
 export const ProductListingBlock: React.FC<Props> = async (props) => {
-  const { sectionDescription, heading, enableSearch, tabs } = props
+  const { heading, listingMode, enableSearch, tabs, modeLimit } = props
+  const activeMode = listingMode || 'categories'
+
+  if (activeMode !== 'categories') {
+    const normalizedModeLimit =
+      typeof modeLimit === 'number' && modeLimit > 0 ? Math.min(24, modeLimit) : 24
+
+    return (
+      <ProductListingClient
+        heading={heading}
+        listingMode={activeMode}
+        modeLimit={normalizedModeLimit}
+        tabs={[]}
+      />
+    )
+  }
 
   const payload = await getPayload({ config: configPromise })
 
@@ -67,8 +82,8 @@ export const ProductListingBlock: React.FC<Props> = async (props) => {
 
   return (
     <ProductListingClient
-      sectionDescription={sectionDescription}
       heading={heading}
+      listingMode={activeMode}
       enableSearch={enableSearch ?? undefined}
       tabs={nonEmptyTabs}
     />

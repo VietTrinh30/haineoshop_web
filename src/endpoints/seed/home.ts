@@ -118,7 +118,7 @@ export const homePageData = ({ ctx }: HomePageArgs): RequiredDataFromCollectionS
         blockName: 'Homepage Product Listing',
         blockType: 'productListing' as const,
         heading: 'Featured Products',
-        sectionDescription: 'Discover our favorite bouquets and plants, hand-picked to inspire your next gift or corner refresh.',
+        listingMode: 'categories' as const,
         enableSearch: true,
         tabs: ['bouquets', 'indoor-plants', 'outdoor-plants', 'dried-flowers'].map((slug) => ({
           label: ctx.categories[slug]?.title || slug,
