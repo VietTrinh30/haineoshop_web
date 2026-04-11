@@ -52,6 +52,45 @@ export const ProductListingBlock: React.FC<Props> = async (props) => {
       )
     }
 
+    if (activeMode === 'topSelling') {
+      const payload = await getPayload({ config: configPromise })
+      const fetched = await payload.find({
+        collection: 'products',
+        depth: 1,
+        limit: normalizedModeLimit,
+        where: {
+          and: [
+            { _status: { equals: 'published' } },
+            { isTopSelling: { equals: true } },
+          ],
+        },
+        sort: 'topSellingOrder',
+      })
+
+      const docs = [...(fetched.docs as Product[])].sort((a, b) => {
+        const orderA =
+          typeof a.topSellingOrder === 'number'
+            ? a.topSellingOrder
+            : Number.MAX_SAFE_INTEGER
+        const orderB =
+          typeof b.topSellingOrder === 'number'
+            ? b.topSellingOrder
+            : Number.MAX_SAFE_INTEGER
+        if (orderA !== orderB) return orderA - orderB
+        return (a.title || '').localeCompare(b.title || '')
+      })
+
+      return (
+        <ProductListingClient
+          heading={heading}
+          listingMode={activeMode}
+          modeLimit={normalizedModeLimit}
+          products={docs}
+          tabs={[]}
+        />
+      )
+    }
+
     return (
       <ProductListingClient
         heading={heading}

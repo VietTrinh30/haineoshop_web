@@ -25,7 +25,12 @@ export const ProductListingClient: React.FC<ProductListingClientProps> = ({
   }
 
   if (listingMode === 'topSelling') {
-    return <ProductListingTopSellingMode heading={heading} modeLimit={modeLimit} />
+    return (
+      <ProductListingTopSellingMode
+        heading={heading}
+        products={products ?? []}
+      />
+    )
   }
 
   return (

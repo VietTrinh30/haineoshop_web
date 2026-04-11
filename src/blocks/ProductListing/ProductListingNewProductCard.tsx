@@ -11,6 +11,8 @@ import React from 'react'
 
 type Props = {
   product: Product
+  /** Defaults to "New" ribbon; use "bestSeller" for top-selling listings. */
+  badge?: 'new' | 'bestSeller'
 }
 
 function getPrimaryCategoryLabel(product: Product): string | null {
@@ -20,7 +22,10 @@ function getPrimaryCategoryLabel(product: Product): string | null {
   return typeof title === 'string' && title.trim() ? title : null
 }
 
-export const ProductListingNewProductCard: React.FC<Props> = ({ product }) => {
+export const ProductListingNewProductCard: React.FC<Props> = ({
+  product,
+  badge = 'new',
+}) => {
   const image = ((product.gallery && product.gallery[0] && typeof product.gallery[0] === 'object'
     ? (product.gallery[0] as { image: Media }).image
     : null) ?? product.meta?.image) as Media | null
@@ -46,14 +51,25 @@ export const ProductListingNewProductCard: React.FC<Props> = ({ product }) => {
         ) : (
           <div className="h-full w-full bg-muted" />
         )}
-        <span
-          className={
-            'absolute top-3 left-3 rounded-full bg-primary px-2 py-1 ' +
-            'text-[10px] font-bold uppercase tracking-tighter text-primary-foreground'
-          }
-        >
-          New
-        </span>
+        {badge === 'bestSeller' ? (
+          <span
+            className={
+              'absolute top-3 left-3 rounded-full bg-slate-900 px-2 py-1 ' +
+              'text-[10px] font-bold uppercase tracking-tighter text-white'
+            }
+          >
+            Best Seller
+          </span>
+        ) : (
+          <span
+            className={
+              'absolute top-3 left-3 rounded-full bg-primary px-2 py-1 ' +
+              'text-[10px] font-bold uppercase tracking-tighter text-primary-foreground'
+            }
+          >
+            New
+          </span>
+        )}
       </Link>
       <div className="space-y-2 p-4">
         {categoryLabel ? (
