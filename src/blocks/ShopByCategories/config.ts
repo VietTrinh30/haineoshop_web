@@ -26,7 +26,7 @@ export const ShopByCategories: Block = {
       overrides: {
         name: 'exploreMoreLink',
         admin: {
-          description: 'Main "Explore More" button (top right).',
+          description: 'Optional "View All" link (header, next to carousel arrows).',
         },
       },
     }),
@@ -36,9 +36,10 @@ export const ShopByCategories: Block = {
       relationTo: 'categories',
       hasMany: true,
       required: true,
-      maxRows: 4,
+      maxRows: 24,
       admin: {
-        description: 'Categories to show as cards (max 4 for a 2×2 grid).',
+        description:
+          'Categories shown as circular tiles in a horizontal carousel (sorted A–Z by title on the site).',
       },
     },
   ],
