@@ -87,7 +87,7 @@
 
   /* Standard vertical spacing for top-level sections (responsive) */
   .section-spacing {
-    @apply py-8 md:py-12 lg:py-16;
+    @apply py-4 md:py-8 lg:py-12;
   }
 
   /* Debug helpers for layout inspection (similar to Flutter inspector) */

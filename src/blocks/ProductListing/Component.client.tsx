@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client'
 
 import React from 'react'
@@ -13,10 +12,16 @@ export const ProductListingClient: React.FC<ProductListingClientProps> = ({
   listingMode,
   modeLimit,
   enableSearch,
+  products,
   tabs,
 }) => {
   if (listingMode === 'newProducts') {
-    return <ProductListingNewProductsMode heading={heading} modeLimit={modeLimit} />
+    return (
+      <ProductListingNewProductsMode
+        heading={heading}
+        products={products ?? []}
+      />
+    )
   }
 
   if (listingMode === 'topSelling') {

@@ -13,5 +13,6 @@ export type ProductListingClientProps = {
   listingMode?: ListingMode | null
   modeLimit?: number | null
   enableSearch?: boolean
+  products?: Product[]
   tabs: TabWithProducts[]
 }

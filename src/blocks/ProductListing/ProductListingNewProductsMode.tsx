@@ -1,27 +1,77 @@
 'use client'
 
+import type { Product } from '@/payload-types'
+
+import useEmblaCarousel from 'embla-carousel-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import React from 'react'
+
+import { ProductListingNewProductCard } from './ProductListingNewProductCard'
 
 type ProductListingNewProductsModeProps = {
   heading: string
-  modeLimit?: number | null
+  products: Product[]
 }
 
 export const ProductListingNewProductsMode: React.FC<ProductListingNewProductsModeProps> = ({
   heading,
-  modeLimit,
+  products,
 }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' })
+
+  const listable = products.filter((p) => Boolean(p.slug))
+  if (!listable.length) return null
+
   return (
     <section className="bg-white section-spacing">
-      <div className="container space-y-4 md:space-y-6">
-        <div className="mb-2 md:mb-4 lg:mb-6 max-w-xl space-y-2">
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight uppercase text-foreground">
-            {heading}
-          </h2>
+      <div className="container">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-foreground">{heading}</h2>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                aria-label="Show previous products"
+                className={
+                  'flex size-8 items-center justify-center rounded-full border ' +
+                  'border-primary/20 text-primary transition-all ' +
+                  'hover:bg-primary hover:text-primary-foreground'
+                }
+                onClick={() => emblaApi?.scrollPrev()}
+              >
+                <ChevronLeft className="size-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                aria-label="Show next products"
+                className={
+                  'flex size-8 items-center justify-center rounded-full border ' +
+                  'border-primary/20 text-primary transition-all ' +
+                  'hover:bg-primary hover:text-primary-foreground'
+                }
+                onClick={() => emblaApi?.scrollNext()}
+              >
+                <ChevronRight className="size-4" aria-hidden />
+              </button>
+            </div>
+            <Link href="/shop" className="text-sm font-bold text-primary hover:underline">
+              View All
+            </Link>
+          </div>
         </div>
-        <div className="rounded-md border border-dashed border-border/70 p-6 text-sm text-muted-foreground">
-          <div>New Products placeholder (frontend implementation pending).</div>
-          <div>Max products to show: {modeLimit ?? 24}</div>
+
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {listable.map((product) => (
+              <div
+                key={product.id}
+                className="min-w-0 flex-[0_0_100%] pl-px pr-8 sm:flex-[0_0_50%] lg:flex-[0_0_25%] pb-2"
+              >
+                <ProductListingNewProductCard product={product} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

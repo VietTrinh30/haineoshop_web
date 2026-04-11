@@ -1,5 +1,6 @@
 import type { Product, ProductListingBlock as ProductListingBlockProps } from '@/payload-types'
 
+import { DEFAULT_NEW_PRODUCT_DAYS } from '@/globals/GeneralSettings'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import React from 'react'
@@ -9,12 +10,47 @@ import { ProductListingClient } from './Component.client'
 type Props = ProductListingBlockProps
 
 export const ProductListingBlock: React.FC<Props> = async (props) => {
-  const { heading, listingMode, enableSearch, tabs, modeLimit } = props
+  const { heading, listingMode, enableSearch, tabs, modeLimit, newProductDays } = props
   const activeMode = listingMode || 'categories'
 
   if (activeMode !== 'categories') {
     const normalizedModeLimit =
       typeof modeLimit === 'number' && modeLimit > 0 ? Math.min(24, modeLimit) : 24
+
+    if (activeMode === 'newProducts') {
+      const payload = await getPayload({ config: configPromise })
+      const days =
+        typeof newProductDays === 'number' && newProductDays > 0
+          ? newProductDays
+          : DEFAULT_NEW_PRODUCT_DAYS
+
+      const now = new Date()
+      const thresholdMs = now.getTime() - days * 24 * 60 * 60 * 1000
+      const thresholdISO = new Date(thresholdMs).toISOString()
+
+      const fetched = await payload.find({
+        collection: 'products',
+        depth: 1,
+        limit: normalizedModeLimit,
+        sort: '-createdAt',
+        where: {
+          and: [
+            { _status: { equals: 'published' } },
+            { createdAt: { greater_than: thresholdISO } },
+          ],
+        },
+      })
+
+      return (
+        <ProductListingClient
+          heading={heading}
+          listingMode={activeMode}
+          modeLimit={normalizedModeLimit}
+          products={fetched.docs as Product[]}
+          tabs={[]}
+        />
+      )
+    }
 
     return (
       <ProductListingClient
