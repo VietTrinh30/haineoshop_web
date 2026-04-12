@@ -109,6 +109,7 @@ export const homePageData = ({ ctx }: HomePageArgs): RequiredDataFromCollectionS
       {
         blockName: 'Limited Time Offer',
         blockType: 'saleOffer',
+        offerMode: 'product' as const,
         sectionTitle: 'Limited Time Offer',
         sectionDescription: "Don't miss out on our best deals. Grab your favourite items before they're gone.",
         highlight: "BEST DEAL, LIMITED TIME OFFER GET YOUR'S NOW!",

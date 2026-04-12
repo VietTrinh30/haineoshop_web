@@ -1,18 +1,20 @@
 'use client'
 
-import type { Category, Media, Product } from '@/payload-types'
+import type { Category, Media, Product, SaleEvent } from '@/payload-types'
 
 import { Price } from '@/components/Price'
 import { SalePrice } from '@/components/SalePrice'
-import { getEffectivePrice } from '@/utilities/saleEvents'
+import { calculateDiscountPercentage, getEffectivePrice } from '@/utilities/saleEvents'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {
   product: Product
-  /** Defaults to "New" ribbon; use "bestSeller" for top-selling listings. */
-  badge?: 'new' | 'bestSeller'
+  /** Defaults to "New" ribbon; use "bestSeller" or flash-sale "-X%". */
+  badge?: 'new' | 'bestSeller' | 'salePercent'
+  /** When set, sale prices resolve against these campaigns (e.g. linked flash event). */
+  campaigns?: SaleEvent[]
 }
 
 function getPrimaryCategoryLabel(product: Product): string | null {
@@ -22,16 +24,21 @@ function getPrimaryCategoryLabel(product: Product): string | null {
   return typeof title === 'string' && title.trim() ? title : null
 }
 
-export const ProductListingNewProductCard: React.FC<Props> = ({
+export const ProductCartItem: React.FC<Props> = ({
   product,
   badge = 'new',
+  campaigns = [],
 }) => {
   const image = ((product.gallery && product.gallery[0] && typeof product.gallery[0] === 'object'
     ? (product.gallery[0] as { image: Media }).image
     : null) ?? product.meta?.image) as Media | null
 
-  const priceInfo = getEffectivePrice(product)
+  const priceInfo = getEffectivePrice(product, campaigns)
   const { price, originalPrice, isOnSale } = priceInfo
+  const discountPct =
+    isOnSale && originalPrice != null && typeof price === 'number'
+      ? calculateDiscountPercentage(originalPrice, price)
+      : 0
   const categoryLabel = getPrimaryCategoryLabel(product)
   const slug = product.slug
 
@@ -60,6 +67,15 @@ export const ProductListingNewProductCard: React.FC<Props> = ({
           >
             Best Seller
           </span>
+        ) : badge === 'salePercent' ? (
+          <span
+            className={
+              'absolute top-3 left-3 rounded-full bg-red-500 px-2 py-1 ' +
+              'text-[10px] font-bold uppercase tracking-tighter text-primary-foreground'
+            }
+          >
+            {discountPct > 0 ? `-${discountPct}%` : 'Sale'}
+          </span>
         ) : (
           <span
             className={
@@ -85,7 +101,7 @@ export const ProductListingNewProductCard: React.FC<Props> = ({
                 as="div"
                 className="flex-col items-start gap-0"
                 salePriceClassName="text-lg font-extrabold text-primary"
-                originalPriceClassName="text-xs"
+                originalPriceClassName="text-sm text-slate-400"
               />
             ) : (
               <Price as="p" amount={price} className="text-lg font-extrabold text-primary" />

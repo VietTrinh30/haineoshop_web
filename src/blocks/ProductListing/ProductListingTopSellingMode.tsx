@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-import { ProductListingNewProductCard } from './ProductListingNewProductCard'
+import { ProductCartItem } from '@/components/product/ProductCartItem'
 
 type ProductListingTopSellingModeProps = {
   heading: string
@@ -68,7 +68,7 @@ export const ProductListingTopSellingMode: React.FC<ProductListingTopSellingMode
                 key={product.id}
                 className="min-w-0 flex-[0_0_100%] pl-px pr-8 sm:flex-[0_0_50%] lg:flex-[0_0_25%] pb-2"
               >
-                <ProductListingNewProductCard product={product} badge="bestSeller" />
+                <ProductCartItem product={product} badge="bestSeller" />
               </div>
             ))}
           </div>

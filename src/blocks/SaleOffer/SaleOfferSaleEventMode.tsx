@@ -1,34 +1,47 @@
 'use client'
 
-import type { Product } from '@/payload-types'
-
+import { ProductCartItem } from '@/components/product/ProductCartItem'
+import { FlashSaleTimer } from '@/components/FlashSaleTimer'
+import type { Product, SaleEvent } from '@/payload-types'
 import useEmblaCarousel from 'embla-carousel-react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-import { ProductCartItem } from '@/components/product/ProductCartItem'
-
-type ProductListingNewProductsModeProps = {
-  heading: string
+export type SaleOfferSaleEventModeProps = {
+  sectionTitle?: string | null
+  saleEvent: SaleEvent
+  saleEventShowCountdown?: boolean | null
   products: Product[]
 }
 
-export const ProductListingNewProductsMode: React.FC<ProductListingNewProductsModeProps> = ({
-  heading,
+export function SaleOfferSaleEventMode({
+  sectionTitle,
+  saleEvent,
+  saleEventShowCountdown = true,
   products,
-}) => {
+}: SaleOfferSaleEventModeProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' })
+
+  const heading =
+    sectionTitle?.trim() || saleEvent.title?.trim() || 'Flash Sale'
 
   const listable = products.filter((p) => Boolean(p.slug))
   if (!listable.length) return null
 
+  const campaignForCards = [saleEvent]
+
   return (
     <section className="bg-white section-spacing">
       <div className="container">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-foreground">{heading}</h2>
-          <div className="flex items-center gap-4">
+        <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
+          <div className="flex flex-wrap items-center gap-4">
+            <h2 className="text-2xl font-bold text-foreground">{heading}</h2>
+            {saleEventShowCountdown !== false ? (
+              <FlashSaleTimer endDate={saleEvent.endsAt} />
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end">
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -55,8 +68,15 @@ export const ProductListingNewProductsMode: React.FC<ProductListingNewProductsMo
                 <ChevronRight className="size-4" aria-hidden />
               </button>
             </div>
-            <Link href="/shop" className="text-sm font-bold text-primary hover:underline">
-              View All
+            <Link
+              href="/shop"
+              className={
+                'rounded-full bg-primary/10 px-6 py-2 text-sm font-bold ' +
+                'text-primary transition-all hover:bg-primary ' +
+                'hover:text-primary-foreground'
+              }
+            >
+              View Flash Deals
             </Link>
           </div>
         </div>
@@ -66,9 +86,16 @@ export const ProductListingNewProductsMode: React.FC<ProductListingNewProductsMo
             {listable.map((product) => (
               <div
                 key={product.id}
-                className="min-w-0 flex-[0_0_100%] pl-px pr-8 sm:flex-[0_0_50%] lg:flex-[0_0_25%] pb-2"
+                className={
+                  'min-w-0 flex-[0_0_100%] pl-px pr-8 pb-2 ' +
+                  'sm:flex-[0_0_50%] lg:flex-[0_0_25%]'
+                }
               >
-                <ProductCartItem product={product} />
+                <ProductCartItem
+                  badge="salePercent"
+                  campaigns={campaignForCards}
+                  product={product}
+                />
               </div>
             ))}
           </div>

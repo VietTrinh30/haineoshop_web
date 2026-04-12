@@ -1162,8 +1162,9 @@ export interface PromoBannersBlock {
  * via the `definition` "SaleOfferBlock".
  */
 export interface SaleOfferBlock {
+  offerMode: 'product' | 'saleEvent';
   /**
-   * Optional title above the offer (e.g. "Limited Time Offer").
+   * Optional title above the offer (e.g. "Limited Time Offer"). Used in both Product and Sale event modes.
    */
   sectionTitle?: string | null;
   /**
@@ -1175,9 +1176,53 @@ export interface SaleOfferBlock {
    */
   product?: (number | null) | Product;
   highlight?: string | null;
+  /**
+   * Select an existing sale event from Ecommerce.
+   */
+  linkedSaleEvent?: (number | null) | SaleEvent;
+  /**
+   * When enabled, a countdown can appear for the sale end time.
+   */
+  saleEventShowCountdown?: boolean | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'saleOffer';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sale-events".
+ */
+export interface SaleEvent {
+  id: number;
+  /**
+   * Internal name for this campaign (e.g. Valentine's Day Sale 2025).
+   */
+  title: string;
+  /**
+   * Add each product and its sale price for this campaign.
+   */
+  items?:
+    | {
+        product: number | Product;
+        /**
+         * Sale price in VND for this product. Does not change the product's original price.
+         */
+        salePrice: number;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Status is normally derived from the start/end time by the background job, but can be overridden.
+   */
+  status?: ('scheduled' | 'active' | 'expired') | null;
+  startsAt: string;
+  endsAt: string;
+  /**
+   * Optional notes for marketing or operations.
+   */
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1210,7 +1255,7 @@ export interface ShopByCategoriesBlock {
    */
   description?: string | null;
   /**
-   * Main "Explore More" button (top right).
+   * Optional "View All" link (header, next to carousel arrows).
    */
   exploreMoreLink: {
     type?: ('reference' | 'custom') | null;
@@ -1223,7 +1268,7 @@ export interface ShopByCategoriesBlock {
     label: string;
   };
   /**
-   * Categories to show as cards (max 4 for a 2×2 grid).
+   * Categories shown as circular tiles in a horizontal carousel (sorted A–Z by title on the site).
    */
   categories: (number | Category)[];
   id?: string | null;
@@ -1616,42 +1661,6 @@ export interface Wishlist {
   id: number;
   customer: number | User;
   product: number | Product;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sale-events".
- */
-export interface SaleEvent {
-  id: number;
-  /**
-   * Internal name for this campaign (e.g. Valentine's Day Sale 2025).
-   */
-  title: string;
-  /**
-   * Add each product and its sale price for this campaign.
-   */
-  items?:
-    | {
-        product: number | Product;
-        /**
-         * Sale price in VND for this product. Does not change the product's original price.
-         */
-        salePrice: number;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Status is normally derived from the start/end time by the background job, but can be overridden.
-   */
-  status?: ('scheduled' | 'active' | 'expired') | null;
-  startsAt: string;
-  endsAt: string;
-  /**
-   * Optional notes for marketing or operations.
-   */
-  notes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2236,10 +2245,13 @@ export interface PromoBannersBlockSelect<T extends boolean = true> {
  * via the `definition` "SaleOfferBlock_select".
  */
 export interface SaleOfferBlockSelect<T extends boolean = true> {
+  offerMode?: T;
   sectionTitle?: T;
   sectionDescription?: T;
   product?: T;
   highlight?: T;
+  linkedSaleEvent?: T;
+  saleEventShowCountdown?: T;
   id?: T;
   blockName?: T;
 }
