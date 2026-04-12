@@ -57,7 +57,7 @@ export const NewsletterBlock: React.FC<NewsletterBlockProps> = (props) => {
         }),
       })
         .then(async (res) => {
-          const json = await res.json().catch(() => ({} as any))
+          const json = await res.json().catch(() => ({}) as any)
           clearTimeout(loadingTimer)
           setIsLoading(false)
 
@@ -93,62 +93,66 @@ export const NewsletterBlock: React.FC<NewsletterBlockProps> = (props) => {
   )
 
   return (
-    <div className="bg-neutral-100 py-16 border-t">
-      <div className="container flex flex-col lg:flex-row items-center justify-between gap-10">
-        <div className="max-w-xl">
-          <h3 className="text-3xl font-bold mb-3 uppercase tracking-tight">
-            {title}
-          </h3>
-          {description && (
-            <p className="text-muted-foreground text-lg">
-              {description}
-            </p>
-          )}
-        </div>
-        <div className="w-full max-w-lg">
-          {hasSubmitted ? (
-            alreadySubscribed ? (
-              <p className="text-muted-foreground text-sm">
-                You’re already subscribed with this email. We’ve kept your preferences.
-              </p>
-            ) : confirmationType === 'message' && confirmationMessage ? (
-              <RichText data={confirmationMessage} />
-            ) : (
-              <p className="text-muted-foreground text-sm">
-                Thanks for subscribing! We’ve recorded your email.
-              </p>
-            )
-          ) : (
-            <>
-              {error && (
-                <p className="text-destructive text-sm mb-4">
-                  {error.message}
+    <section className="max-w-[1280px] container px-4 py-16">
+      <div className="bg-primary rounded-4xl p-10 md:p-16 relative overflow-hidden text-center md:text-left">
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="max-w-xl">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4 leading-tight">
+              {title}
+            </h2>
+            {description && <p className="text-white/80 text-lg">{description}</p>}
+          </div>
+          <div className="w-full max-w-md">
+            {hasSubmitted ? (
+              alreadySubscribed ? (
+                <p className="text-white/90 text-sm text-center sm:text-left">
+                  You’re already subscribed with this email. We’ve kept your preferences.
                 </p>
-              )}
-              <form
-                className="flex shadow-sm border-2 border-primary/20 bg-white"
-                onSubmit={onSubmit}
-              >
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="Your email address..."
-                  className="grow px-6 py-5 rounded-none border-none outline-none focus:outline-none focus:ring-0 focus:border-none text-black bg-white"
-                  required
+              ) : confirmationType === 'message' && confirmationMessage ? (
+                <RichText
+                  data={confirmationMessage}
+                  enableGutter={false}
+                  className="mx-0 max-w-none text-white/90 prose prose-invert md:prose-md [&_a]:text-white [&_a]:underline"
                 />
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="bg-primary text-white px-10 py-5 font-bold hover:bg-foreground transition-all duration-300 uppercase tracking-widest text-xs shrink-0 disabled:opacity-70"
-                >
-                  {isLoading ? '...' : submitButtonLabel}
-                </button>
-              </form>
-            </>
-          )}
+              ) : (
+                <p className="text-white/90 text-sm text-center sm:text-left">
+                  Thanks for subscribing! We’ve recorded your email.
+                </p>
+              )
+            ) : (
+              <>
+                {error && (
+                  <p className="text-red-100 text-sm mb-4 text-center sm:text-left">
+                    {error.message}
+                  </p>
+                )}
+                <form className="flex flex-col sm:flex-row gap-3" onSubmit={onSubmit}>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="Enter your email"
+                    className="grow rounded-full border-none px-6 py-4 focus:ring-2 focus:ring-white placeholder:text-slate-400 text-slate-900 outline-none bg-white"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="bg-slate-900 text-white font-bold px-8 py-4 rounded-full hover:bg-slate-800 transition-all disabled:opacity-70 shrink-0"
+                  >
+                    {isLoading ? '...' : submitButtonLabel}
+                  </button>
+                </form>
+                <p className="text-white/60 text-xs mt-3 text-center sm:text-left">
+                  By subscribing, you agree to our privacy policy.
+                </p>
+              </>
+            )}
+          </div>
         </div>
+        <div className="absolute -top-24 -right-24 size-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 size-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
       </div>
-    </div>
+    </section>
   )
 }
