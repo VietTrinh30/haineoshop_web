@@ -30,13 +30,11 @@ export const ShopByCategoriesBlockComponent: React.FC<Props> = (props) => {
   const hasExploreLink = Boolean(exploreMoreLink?.url || exploreMoreLink?.reference)
 
   return (
-    <section className="bg-white section-spacing">
+    <section className="section-spacing">
       <div className="container">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-xl space-y-2">
-            {title ? (
-              <h2 className="text-2xl font-bold text-foreground">{title}</h2>
-            ) : null}
+            {title ? <h2 className="text-2xl font-bold text-foreground">{title}</h2> : null}
             {description ? (
               <p className="text-sm text-muted-foreground md:text-base">{description}</p>
             ) : null}
@@ -79,10 +77,7 @@ export const ShopByCategoriesBlockComponent: React.FC<Props> = (props) => {
                 url={exploreMoreLink.url}
               />
             ) : (
-              <Link
-                href="/shop"
-                className="text-sm font-bold text-primary hover:underline"
-              >
+              <Link href="/shop" className="text-sm font-bold text-primary hover:underline">
                 View All
               </Link>
             )}

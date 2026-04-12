@@ -24,7 +24,7 @@ export const ProductListingTopSellingMode: React.FC<ProductListingTopSellingMode
   if (!listable.length) return null
 
   return (
-    <section className="bg-white section-spacing">
+    <section className="section-spacing">
       <div className="container">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-foreground">{heading}</h2>

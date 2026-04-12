@@ -1,12 +1,11 @@
 'use client'
 
-import { ProductCartItem } from '@/components/product/ProductCartItem'
 import { FlashSaleTimer } from '@/components/FlashSaleTimer'
+import { ProductCartItem } from '@/components/product/ProductCartItem'
 import type { Product, SaleEvent } from '@/payload-types'
 import useEmblaCarousel from 'embla-carousel-react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import React from 'react'
 
 export type SaleOfferSaleEventModeProps = {
   sectionTitle?: string | null
@@ -23,8 +22,7 @@ export function SaleOfferSaleEventMode({
 }: SaleOfferSaleEventModeProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' })
 
-  const heading =
-    sectionTitle?.trim() || saleEvent.title?.trim() || 'Flash Sale'
+  const heading = sectionTitle?.trim() || saleEvent.title?.trim() || 'Flash Sale'
 
   const listable = products.filter((p) => Boolean(p.slug))
   if (!listable.length) return null
@@ -32,7 +30,7 @@ export function SaleOfferSaleEventMode({
   const campaignForCards = [saleEvent]
 
   return (
-    <section className="bg-white section-spacing">
+    <section className="section-spacing">
       <div className="container">
         <div className="mb-8 flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex flex-wrap items-center gap-4">
@@ -87,8 +85,7 @@ export function SaleOfferSaleEventMode({
               <div
                 key={product.id}
                 className={
-                  'min-w-0 flex-[0_0_100%] pl-px pr-8 pb-2 ' +
-                  'sm:flex-[0_0_50%] lg:flex-[0_0_25%]'
+                  'min-w-0 flex-[0_0_100%] pl-px pr-8 pb-2 ' + 'sm:flex-[0_0_50%] lg:flex-[0_0_25%]'
                 }
               >
                 <ProductCartItem

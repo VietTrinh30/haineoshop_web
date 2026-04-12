@@ -115,7 +115,10 @@
 }
 
 :root {
-  --background: oklch(100% 0 0deg);
+  /* Page canvas (Hai Neo Shop reference: warm light / deep plum dark) */
+  --background-light: #f8f6f7;
+  --background-dark: #211119;
+  --background: var(--background-light);
   --foreground: oklch(14.5% 0 0deg);
   --card: oklch(100% 0 0deg);
   --card-foreground: oklch(14.5% 0 0deg);
@@ -141,7 +144,7 @@
 }
 
 [data-theme='dark'] {
-  --background: oklch(14.5% 0 0deg);
+  --background: var(--background-dark);
   --foreground: oklch(98.5% 0 0deg);
   --card: oklch(17% 0 0deg);
   --card-foreground: oklch(98.5% 0 0deg);
@@ -164,6 +167,8 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-light: var(--background-light);
+  --color-background-dark: var(--background-dark);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
