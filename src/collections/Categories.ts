@@ -29,6 +29,14 @@ export const Categories: CollectionConfig = {
       },
     },
     {
+      name: 'icon',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description: 'SVG icon shown next to the category name in the shop sidebar.',
+      },
+    },
+    {
       name: 'image',
       type: 'upload',
       relationTo: 'media',

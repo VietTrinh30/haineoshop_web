@@ -6,7 +6,7 @@ import React, { Suspense } from 'react'
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={null}>
-      <div className="container flex flex-col gap-8 my-16 pb-4 ">
+      <div className="grow max-w-[1600px] mx-auto w-full px-4 md:px-6 py-8">
         <div className="flex flex-col md:flex-row items-start justify-between gap-16 md:gap-4">
           <div className="w-full flex-none flex flex-col gap-4 md:gap-8 basis-1/5">
             <Categories />

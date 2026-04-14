@@ -1,9 +1,9 @@
 'use client'
 import React, { useCallback, useMemo } from 'react'
 
-import { Category } from '@/payload-types'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { Category, Media } from '@/payload-types'
 import clsx from 'clsx'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 type Props = {
   category: Category
@@ -32,14 +32,32 @@ export const CategoryItem: React.FC<Props> = ({ category }) => {
     router.push(pathname + '?' + newParams)
   }, [category.id, isActive, pathname, router, searchParams])
 
+  const iconUrl =
+    category.icon && typeof category.icon === 'object' ? (category.icon as Media).url : null
+
   return (
     <button
       onClick={() => setQuery()}
-      className={clsx('hover:cursor-pointer', {
-        ' underline': isActive,
-      })}
+      className={clsx(
+        'flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-all cursor-pointer',
+        {
+          'bg-primary text-white shadow-sm': isActive,
+          'text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary': !isActive,
+        },
+      )}
     >
-      {category.title}
+      {iconUrl && (
+        <span
+          className="w-6 h-6 shrink-0 inline-block bg-current"
+          style={{
+            maskImage: `url(${iconUrl})`,
+            maskSize: 'contain',
+            maskRepeat: 'no-repeat',
+            maskPosition: 'center',
+          }}
+        />
+      )}
+      <span className="text-sm font-medium">{category.title}</span>
     </button>
   )
 }

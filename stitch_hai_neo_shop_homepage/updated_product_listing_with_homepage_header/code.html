@@ -1,331 +1,627 @@
-<!DOCTYPE html>
+<!doctype html>
 
-<html lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#e963a6",
-                        "background-light": "#f8f6f7",
-                        "background-dark": "#211119",
-                    },
-                    fontFamily: {
-                        "display": ["Manrope"]
-                    },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
-                },
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#e963a6',
+              'background-light': '#f8f6f7',
+              'background-dark': '#211119',
             },
-        }
+            fontFamily: {
+              display: ['Manrope'],
+            },
+            borderRadius: { DEFAULT: '0.5rem', lg: '0.5rem', xl: '0.75rem', full: '9999px' },
+          },
+        },
+      }
     </script>
-<title>Hai Neo Shop - All Products</title>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
-<div class="flex flex-col min-h-screen">
-<!-- Top Navigation Bar (Updated to match SCREEN_8) -->
-<header class="sticky top-0 z-50 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
-<div class="border-b border-primary/10 px-4 md:px-20 lg:px-40 py-3">
-<div class="flex items-center justify-between gap-4 max-w-[1280px] mx-auto">
-<div class="flex items-center gap-6">
-<a class="flex items-center gap-2 group" href="#">
-<div class="size-10 flex items-center justify-center rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-<span class="material-symbols-outlined text-2xl">pets</span>
-</div>
-<h2 class="text-slate-900 dark:text-white text-xl font-extrabold leading-tight tracking-tight">ai Neo <span class="text-primary">Shop</span></h2>
-</a>
-<!-- Desktop Search -->
-<div class="hidden md:flex items-center bg-primary/5 dark:bg-primary/10 rounded-full px-4 py-2 w-64 lg:w-96 border border-transparent focus-within:border-primary/30 focus-within:bg-white transition-all">
-<span class="material-symbols-outlined text-primary/60 text-xl">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-primary/40" placeholder="Find your beauty essentials..." type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-3 md:gap-6">
-<button class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200">
-<span class="material-symbols-outlined">person</span>
-</button>
-<button class="relative flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200">
-<span class="material-symbols-outlined">shopping_bag</span>
-<span class="absolute top-1 right-1 size-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold">2</span>
-</button>
-</div>
-</div>
-</div>
-<!-- Navigation Toolbar -->
-<nav class="hidden md:block border-b border-primary/10 px-4 md:px-20 lg:px-40 py-2">
-<div class="max-w-[1280px] mx-auto flex items-center justify-between text-sm font-semibold">
-<div class="flex items-center gap-8">
-<div class="relative group cursor-pointer flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
-<span>Categories</span>
-<span class="material-symbols-outlined text-lg">expand_more</span>
-<!-- Dropdown -->
-<div class="absolute top-full left-0 w-48 bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-primary/10 py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-50">
-<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Skin Care</a>
-<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Makeup</a>
-<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Body Care</a>
-<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Hair Care</a>
-<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Fragrance</a>
-<a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#">Men's Care</a>
-</div>
-</div>
-<a class="text-primary underline underline-offset-8 decoration-2" href="#">Shop</a>
-<a class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href="#">New Products</a>
-<a class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href="#">Top Selling</a>
-<a class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors" href="#">Hot Deals</a>
-</div>
-</div>
-</nav>
-</header>
-<!-- Main Content Area -->
-<main class="flex-grow max-w-[1600px] mx-auto w-full px-4 md:px-6 py-8">
-<div class="flex flex-col md:flex-row gap-8">
-<!-- Sidebar Filters -->
-<aside class="w-full md:w-64 flex-shrink-0">
-<div class="sticky top-40 space-y-8">
-<div>
-<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">Categories</h3>
-<div class="space-y-2">
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white shadow-sm transition-all" href="#">
-<span class="material-symbols-outlined text-xl">spa</span>
-<span class="text-sm font-medium">Skin Care</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-xl">brush</span>
-<span class="text-sm font-medium">Makeup</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-xl">favorite</span>
-<span class="text-sm font-medium">Body Care</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-xl">air</span>
-<span class="text-sm font-medium">Hair Care</span>
-</a>
-<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all" href="#">
-<span class="material-symbols-outlined text-xl">potted_plant</span>
-<span class="text-sm font-medium">Fragrance</span>
-</a>
-</div>
-</div>
-<div>
-<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">Price Range</h3>
-<div class="px-2">
-<div class="relative h-1 bg-slate-200 dark:bg-slate-700 rounded-full mb-6">
-<div class="absolute h-full bg-primary left-0 right-1/4 rounded-full"></div>
-<div class="absolute -top-1.5 left-0 size-4 bg-primary border-2 border-white dark:border-background-dark rounded-full shadow-md cursor-pointer"></div>
-<div class="absolute -top-1.5 right-1/4 size-4 bg-primary border-2 border-white dark:border-background-dark rounded-full shadow-md cursor-pointer"></div>
-</div>
-<div class="flex items-center justify-between text-xs font-bold text-slate-500">
-<span>$0</span>
-<span>$500</span>
-</div>
-</div>
-</div>
-<button class="w-full py-3 px-4 bg-primary/10 text-primary border border-primary/20 font-bold rounded-lg hover:bg-primary hover:text-white transition-all text-sm">
-                        Clear All Filters
-                    </button>
-</div>
-</aside>
-<!-- Product Display -->
-<div class="flex-grow">
-<!-- Sorting & Info -->
-<div class="flex flex-col gap-6 mb-8">
-<div class="flex items-center justify-between">
-<p class="text-sm text-slate-500 dark:text-slate-400">Showing <span class="font-bold text-slate-900 dark:text-slate-100">12</span> of <span class="font-bold text-slate-900 dark:text-slate-100">48</span> products</p>
-</div>
-<div class="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
-<span class="text-sm font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">Sort By:</span>
-<div class="flex gap-2">
-<button class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-primary text-white">A-Z</button>
-<button class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Z-A</button>
-<button class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Price: Low to High</button>
-<button class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Price: High to Low</button>
-<button class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors">Top Rated</button>
-</div>
-</div>
-</div>
-<!-- Products Grid -->
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-<!-- Product Card 1: Regular Item -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Luxury facial cream jar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAk_9azjBonUEWqc7EKLxXzI5uJ_grZxXYvq-mHbEnVr9x1apVj-60f14Ym2Kow3t1r6jK_xufz60K45TIXAqR5tX9WKl5eWHR5JMwTM-OgAbZJTqzCeegucbBMA_QeK_sqsqKkgSh5TvcBxPYCgKFBfshblbg0KVJBTtWbFIQgL95VQpBkiYg4UxSS8sxYDeedDkQXS6lrYBUfr5T7BOaf4vjOltMa-ChSRlI4GiS0uSNFE1nO-JjcV-vwkqhWkOHaPswIyqK-8A"/>
-</div>
-<div class="p-3">
-<p class="text-primary text-[10px] font-bold uppercase mb-1">Skin Care</p>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">Glow Radiance Serum</h4>
-<div class="flex items-center">
-<span class="text-base font-extrabold text-slate-900 dark:text-slate-100">$45.00</span>
-</div>
-</div>
-</div>
-<!-- Product Card 2: Sale Item -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Body scrub container with sea salt" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCriqcz88YU1MJYBs8FzdBMbu7A_mZJFO1PzW3XD_j8ilbXkP4o4RErsZ-MUX305WurQas9YG59kmITjaZdAboUFdiY1er8Yma4u0gUypgDWEAq41uw9r3wVrdJU4lVDODIYzPjYOefE92ia1Y-ktjyOh6lhdqMYcs0m9ozRSpZcgi_duTIMqliovGRai-8zinMHtjuFyKRFZm-Nl0AhEyP8g0pC2W4z1g1qH74KMdRcA62vAoC78lGxGaJ6Za9ofZu3TanriYw6w"/>
-<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">-20%</div>
-</div>
-<div class="p-3">
-<p class="text-primary text-[10px] font-bold uppercase mb-1">Body Care</p>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">Sea Salt Exfoliator</h4>
-<div class="flex flex-wrap items-baseline gap-2">
-<span class="text-base font-extrabold text-red-500">$28.00</span>
-<span class="text-xs text-slate-400 line-through">$35.00</span>
-</div>
-</div>
-</div>
-<!-- Product Card 3: Sold Out Item -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Nude lipstick palette" class="w-full h-full object-cover grayscale opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIR09ZzIv_JEvs55eIFNyrB0wVA2DU0YyKXYMMQiXXcDW0mAXDqFQX0DGT1-EfpbI_jqN1PfmEFL-SlSoqoOesNEF28A6ZlIJBT_2C0hMP7bg_opFrUmgVeBQxE-eBsrldlMZ97AbA2QQhufM0glhqWm1QjUnlPyuPol6zhCaF6jXzNOatnCQGOnLzIGbGwx6Oh0vfq90jL0_rDzJLcoGa2w563kMOZC-cnQ5yC_GHkgcWq39rWUlwU007ZFn8-vSukmSGEFrZ0w"/>
-<div class="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
-<span class="bg-white text-slate-900 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider">Sold Out</span>
-</div>
-</div>
-<div class="p-3">
-<p class="text-slate-400 text-[10px] font-bold uppercase mb-1">Makeup</p>
-<h4 class="text-slate-400 dark:text-slate-500 font-bold text-sm mb-2 line-clamp-2">Velvet Matte Lipstick</h4>
-<div class="flex items-center">
-<span class="text-base font-extrabold text-slate-400">$22.00</span>
-</div>
-</div>
-</div>
-<!-- Product Card 4 -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Golden serum bottle" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmN-_fZkKQcowKxB_fTMYu2GdIm-3TpS1uIyO-G4AGY3gYWvilofVW_-H8yiUOoAUOKqo7eN4B_4TH83HXKfCa70eXN5bDMHFybok5n5fC0UGWk4wzBCcQS5hs1IOVL0bxfbROSRf7P1pOurj9Axg82KXjbf0tlz-AkldEKv15Dssn6M4c6uJqW2LyyS8A4JRlCRxxR0PdTLjPNcbskQvSmWdgWzphUyq_U4P6v0KIMXMDsQPQAs1zwZ4StdGzf49hLzIFZc1xwQ"/>
-</div>
-<div class="p-3">
-<p class="text-primary text-[10px] font-bold uppercase mb-1">Skin Care</p>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">Youthful Night Elixir</h4>
-<div class="flex items-center">
-<span class="text-base font-extrabold text-slate-900 dark:text-slate-100">$64.00</span>
-</div>
-</div>
-</div>
-<!-- Product Card 5 -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Pink minimalist perfume bottle" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApm_bI1q4R36ldUGSl0WqUS-rt9D_bVFouXYEMLztFq7OunmNoh0zjAzwcD8xwLb1HOTbvxiL6NDUZj33m62zTLi5zWERwHze0txWfTy86HrNy-7JBfomajwWK5BGD9ljePLB9AzUd8L--2zvZzwMxvKWOphBDVr2-yCKEwS_0PvBFY6B6H4hZ3eoNQx9b00qEwRHB19TWhgc3SQ3E45VD3XrwRCWBdBuHz7cvMocPDC6tNqEfslHUjLNO7IgVaTbZGc-qblMQQw"/>
-</div>
-<div class="p-3">
-<p class="text-primary text-[10px] font-bold uppercase mb-1">Fragrance</p>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">Petal Whisper Perfume</h4>
-<div class="flex items-center">
-<span class="text-base font-extrabold text-slate-900 dark:text-slate-100">$85.00</span>
-</div>
-</div>
-</div>
-<!-- Product Card 6 -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Hair oil with wooden dropper" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSXKoVrmKUXtL5WekncE4yPdbrixOzllVdrEDRjdF-1RpL2d772DBPXBYvLPjsXELepK3_WuNSCtsBHGzGFeGKtkPLdYCuG51lpWeFyOPRFBoeuEteUHrnYVKu4hj0NV8NcOcE17aydFbLeQl6QvKS3NOqxvUbSzfJ4gXyK2sRPijs7Z10auJfpdHptrHZFFiL6G4NxFJtDjAjdD0PPFo6E3dsNhvUHNUQEsp4VbUo7mQksVrj8HrmtfaRydc6JI5vJb-NGtSbJw"/>
-</div>
-<div class="p-3">
-<p class="text-primary text-[10px] font-bold uppercase mb-1">Hair Care</p>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">Nourishing Argan Oil</h4>
-<div class="flex items-center">
-<span class="text-base font-extrabold text-slate-900 dark:text-slate-100">$32.00</span>
-</div>
-</div>
-</div>
-<!-- Repeat some cards to fill the row -->
-<div class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300">
-<div class="relative aspect-square overflow-hidden bg-slate-100">
-<img alt="Cosmetic bottle" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmN-_fZkKQcowKxB_fTMYu2GdIm-3TpS1uIyO-G4AGY3gYWvilofVW_-H8yiUOoAUOKqo7eN4B_4TH83HXKfCa70eXN5bDMHFybok5n5fC0UGWk4wzBCcQS5hs1IOVL0bxfbROSRf7P1pOurj9Axg82KXjbf0tlz-AkldEKv15Dssn6M4c6uJqW2LyyS8A4JRlCRxxR0PdTLjPNcbskQvSmWdgWzphUyq_U4P6v0KIMXMDsQPQAs1zwZ4StdGzf49hLzIFZc1xwQ"/>
-</div>
-<div class="p-3">
-<p class="text-primary text-[10px] font-bold uppercase mb-1">Skin Care</p>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">Daily Moisture Lotion</h4>
-<div class="flex items-center">
-<span class="text-base font-extrabold text-slate-900 dark:text-slate-100">$24.00</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Pagination -->
-<div class="mt-12 flex justify-center">
-<nav class="flex items-center gap-1">
-<button class="size-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-primary/10 hover:text-primary transition-all">
-<span class="material-symbols-outlined">chevron_left</span>
-</button>
-<button class="size-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold shadow-sm">1</button>
-<button class="size-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary font-medium transition-all">2</button>
-<button class="size-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary font-medium transition-all">3</button>
-<span class="px-2 text-slate-400">...</span>
-<button class="size-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary font-medium transition-all">8</button>
-<button class="size-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-primary/10 hover:text-primary transition-all">
-<span class="material-symbols-outlined">chevron_right</span>
-</button>
-</nav>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="bg-white dark:bg-slate-950 border-t border-primary/10 pt-16 pb-8">
-<div class="max-w-7xl mx-auto px-4 md:px-6">
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-<div class="space-y-6">
-<div class="flex items-center gap-2 text-primary">
-<span class="material-symbols-outlined text-3xl">auto_awesome</span>
-<h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight">Hai Neo Shop</h2>
-</div>
-<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                        Discover the essence of natural beauty with our curated collection of ethical and high-performance cosmetics.
-                    </p>
-<div class="flex items-center gap-4">
-<a class="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
-<span class="material-symbols-outlined text-lg">public</span>
-</a>
-<a class="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
-<span class="material-symbols-outlined text-lg">photo_camera</span>
-</a>
-<a class="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all" href="#">
-<span class="material-symbols-outlined text-lg">play_arrow</span>
-</a>
-</div>
-</div>
-<div>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold mb-6">Quick Links</h4>
-<ul class="space-y-4">
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">Our Story</a></li>
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">Shop All</a></li>
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">New Arrivals</a></li>
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">Beauty Blog</a></li>
-</ul>
-</div>
-<div>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold mb-6">Customer Care</h4>
-<ul class="space-y-4">
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">Track Order</a></li>
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">Shipping Policy</a></li>
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">Returns &amp; Refunds</a></li>
-<li><a class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors" href="#">FAQ</a></li>
-</ul>
-</div>
-<div>
-<h4 class="text-slate-900 dark:text-slate-100 font-bold mb-6">Newsletter</h4>
-<p class="text-slate-500 dark:text-slate-400 text-sm mb-4">Subscribe to receive updates, access to exclusive deals, and more.</p>
-<form class="flex flex-col gap-3">
-<input class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Enter your email" type="email"/>
-<button class="bg-primary text-white font-bold py-2 rounded-lg hover:bg-primary/90 transition-all text-sm">Subscribe</button>
-</form>
-</div>
-</div>
-<div class="border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-<p class="text-slate-400 text-xs">© 2024 Hai Neo Shop. All rights reserved.</p>
-<div class="flex gap-6">
-<a class="text-slate-400 hover:text-primary text-xs transition-colors" href="#">Privacy Policy</a>
-<a class="text-slate-400 hover:text-primary text-xs transition-colors" href="#">Terms of Service</a>
-</div>
-</div>
-</div>
-</footer>
-</div>
-</body></html>
+    <title>Hai Neo Shop - All Products</title>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100"
+  >
+    <div class="flex flex-col min-h-screen">
+      <!-- Top Navigation Bar (Updated to match SCREEN_8) -->
+      <header
+        class="sticky top-0 z-50 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-md"
+      >
+        <div class="border-b border-primary/10 px-4 md:px-20 lg:px-40 py-3">
+          <div class="flex items-center justify-between gap-4 max-w-[1280px] mx-auto">
+            <div class="flex items-center gap-6">
+              <a class="flex items-center gap-2 group" href="#">
+                <div
+                  class="size-10 flex items-center justify-center rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors"
+                >
+                  <span class="material-symbols-outlined text-2xl">pets</span>
+                </div>
+                <h2
+                  class="text-slate-900 dark:text-white text-xl font-extrabold leading-tight tracking-tight"
+                >
+                  ai Neo <span class="text-primary">Shop</span>
+                </h2>
+              </a>
+              <!-- Desktop Search -->
+              <div
+                class="hidden md:flex items-center bg-primary/5 dark:bg-primary/10 rounded-full px-4 py-2 w-64 lg:w-96 border border-transparent focus-within:border-primary/30 focus-within:bg-white transition-all"
+              >
+                <span class="material-symbols-outlined text-primary/60 text-xl">search</span>
+                <input
+                  class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-primary/40"
+                  placeholder="Find your beauty essentials..."
+                  type="text"
+                />
+              </div>
+            </div>
+            <div class="flex items-center gap-3 md:gap-6">
+              <button
+                class="flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200"
+              >
+                <span class="material-symbols-outlined">person</span>
+              </button>
+              <button
+                class="relative flex items-center justify-center p-2 rounded-full hover:bg-primary/10 transition-colors text-slate-700 dark:text-slate-200"
+              >
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <span
+                  class="absolute top-1 right-1 size-4 bg-primary text-white text-[10px] flex items-center justify-center rounded-full font-bold"
+                  >2</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Navigation Toolbar -->
+        <nav class="hidden md:block border-b border-primary/10 px-4 md:px-20 lg:px-40 py-2">
+          <div
+            class="max-w-[1280px] mx-auto flex items-center justify-between text-sm font-semibold"
+          >
+            <div class="flex items-center gap-8">
+              <div
+                class="relative group cursor-pointer flex items-center gap-1 text-slate-700 dark:text-slate-200 hover:text-primary transition-colors"
+              >
+                <span>Categories</span>
+                <span class="material-symbols-outlined text-lg">expand_more</span>
+                <!-- Dropdown -->
+                <div
+                  class="absolute top-full left-0 w-48 bg-white dark:bg-slate-800 shadow-xl rounded-lg border border-primary/10 py-2 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all z-50"
+                >
+                  <a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#"
+                    >Skin Care</a
+                  >
+                  <a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#"
+                    >Makeup</a
+                  >
+                  <a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#"
+                    >Body Care</a
+                  >
+                  <a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#"
+                    >Hair Care</a
+                  >
+                  <a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#"
+                    >Fragrance</a
+                  >
+                  <a class="block px-4 py-2 hover:bg-primary/10 hover:text-primary" href="#"
+                    >Men's Care</a
+                  >
+                </div>
+              </div>
+              <a class="text-primary underline underline-offset-8 decoration-2" href="#">Shop</a>
+              <a
+                class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors"
+                href="#"
+                >New Products</a
+              >
+              <a
+                class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors"
+                href="#"
+                >Top Selling</a
+              >
+              <a
+                class="text-slate-700 dark:text-slate-200 hover:text-primary transition-colors"
+                href="#"
+                >Hot Deals</a
+              >
+            </div>
+          </div>
+        </nav>
+      </header>
+      <!-- Main Content Area -->
+      <main class="flex-grow max-w-[1600px] mx-auto w-full px-4 md:px-6 py-8">
+        <div class="flex flex-col md:flex-row gap-8">
+          <!-- Sidebar Filters -->
+          <aside class="w-full md:w-64 flex-shrink-0">
+            <div class="sticky top-40 space-y-8">
+              <div>
+                <h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">
+                  Categories
+                </h3>
+                <div class="space-y-2">
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary text-white shadow-sm transition-all"
+                    href="#"
+                  >
+                    <span class="material-symbols-outlined text-xl">spa</span>
+                    <span class="text-sm font-medium">Skin Care</span>
+                  </a>
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all"
+                    href="#"
+                  >
+                    <span class="material-symbols-outlined text-xl">brush</span>
+                    <span class="text-sm font-medium">Makeup</span>
+                  </a>
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all"
+                    href="#"
+                  >
+                    <span class="material-symbols-outlined text-xl">favorite</span>
+                    <span class="text-sm font-medium">Body Care</span>
+                  </a>
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all"
+                    href="#"
+                  >
+                    <span class="material-symbols-outlined text-xl">air</span>
+                    <span class="text-sm font-medium">Hair Care</span>
+                  </a>
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-all"
+                    href="#"
+                  >
+                    <span class="material-symbols-outlined text-xl">potted_plant</span>
+                    <span class="text-sm font-medium">Fragrance</span>
+                  </a>
+                </div>
+              </div>
+              <div>
+                <h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">
+                  Price Range
+                </h3>
+                <div class="px-2">
+                  <div class="relative h-1 bg-slate-200 dark:bg-slate-700 rounded-full mb-6">
+                    <div class="absolute h-full bg-primary left-0 right-1/4 rounded-full"></div>
+                    <div
+                      class="absolute -top-1.5 left-0 size-4 bg-primary border-2 border-white dark:border-background-dark rounded-full shadow-md cursor-pointer"
+                    ></div>
+                    <div
+                      class="absolute -top-1.5 right-1/4 size-4 bg-primary border-2 border-white dark:border-background-dark rounded-full shadow-md cursor-pointer"
+                    ></div>
+                  </div>
+                  <div class="flex items-center justify-between text-xs font-bold text-slate-500">
+                    <span>$0</span>
+                    <span>$500</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="w-full py-3 px-4 bg-primary/10 text-primary border border-primary/20 font-bold rounded-lg hover:bg-primary hover:text-white transition-all text-sm"
+              >
+                Clear All Filters
+              </button>
+            </div>
+          </aside>
+          <!-- Product Display -->
+          <div class="flex-grow">
+            <!-- Sorting & Info -->
+            <div class="flex flex-col gap-6 mb-8">
+              <div class="flex items-center justify-between">
+                <p class="text-sm text-slate-500 dark:text-slate-400">
+                  Showing <span class="font-bold text-slate-900 dark:text-slate-100">12</span> of
+                  <span class="font-bold text-slate-900 dark:text-slate-100">48</span> products
+                </p>
+              </div>
+              <div class="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
+                <span class="text-sm font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap"
+                  >Sort By:</span
+                >
+                <div class="flex gap-2">
+                  <button
+                    class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-primary text-white"
+                  >
+                    A-Z
+                  </button>
+                  <button
+                    class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors"
+                  >
+                    Z-A
+                  </button>
+                  <button
+                    class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors"
+                  >
+                    Price: Low to High
+                  </button>
+                  <button
+                    class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors"
+                  >
+                    Price: High to Low
+                  </button>
+                  <button
+                    class="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-primary transition-colors"
+                  >
+                    Top Rated
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Products Grid -->
+            <div
+              class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
+            >
+              <!-- Product Card 1: Regular Item -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Luxury facial cream jar"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAk_9azjBonUEWqc7EKLxXzI5uJ_grZxXYvq-mHbEnVr9x1apVj-60f14Ym2Kow3t1r6jK_xufz60K45TIXAqR5tX9WKl5eWHR5JMwTM-OgAbZJTqzCeegucbBMA_QeK_sqsqKkgSh5TvcBxPYCgKFBfshblbg0KVJBTtWbFIQgL95VQpBkiYg4UxSS8sxYDeedDkQXS6lrYBUfr5T7BOaf4vjOltMa-ChSRlI4GiS0uSNFE1nO-JjcV-vwkqhWkOHaPswIyqK-8A"
+                  />
+                </div>
+                <div class="p-3">
+                  <p class="text-primary text-[10px] font-bold uppercase mb-1">Skin Care</p>
+                  <h4
+                    class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Glow Radiance Serum
+                  </h4>
+                  <div class="flex items-center">
+                    <span class="text-base font-extrabold text-slate-900 dark:text-slate-100"
+                      >$45.00</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- Product Card 2: Sale Item -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Body scrub container with sea salt"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCriqcz88YU1MJYBs8FzdBMbu7A_mZJFO1PzW3XD_j8ilbXkP4o4RErsZ-MUX305WurQas9YG59kmITjaZdAboUFdiY1er8Yma4u0gUypgDWEAq41uw9r3wVrdJU4lVDODIYzPjYOefE92ia1Y-ktjyOh6lhdqMYcs0m9ozRSpZcgi_duTIMqliovGRai-8zinMHtjuFyKRFZm-Nl0AhEyP8g0pC2W4z1g1qH74KMdRcA62vAoC78lGxGaJ6Za9ofZu3TanriYw6w"
+                  />
+                  <div
+                    class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm"
+                  >
+                    -20%
+                  </div>
+                </div>
+                <div class="p-3">
+                  <p class="text-primary text-[10px] font-bold uppercase mb-1">Body Care</p>
+                  <h4
+                    class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Sea Salt Exfoliator
+                  </h4>
+                  <div class="flex flex-wrap items-baseline gap-2">
+                    <span class="text-base font-extrabold text-red-500">$28.00</span>
+                    <span class="text-xs text-slate-400 line-through">$35.00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Product Card 3: Sold Out Item -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Nude lipstick palette"
+                    class="w-full h-full object-cover grayscale opacity-60"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIR09ZzIv_JEvs55eIFNyrB0wVA2DU0YyKXYMMQiXXcDW0mAXDqFQX0DGT1-EfpbI_jqN1PfmEFL-SlSoqoOesNEF28A6ZlIJBT_2C0hMP7bg_opFrUmgVeBQxE-eBsrldlMZ97AbA2QQhufM0glhqWm1QjUnlPyuPol6zhCaF6jXzNOatnCQGOnLzIGbGwx6Oh0vfq90jL0_rDzJLcoGa2w563kMOZC-cnQ5yC_GHkgcWq39rWUlwU007ZFn8-vSukmSGEFrZ0w"
+                  />
+                  <div class="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
+                    <span
+                      class="bg-white text-slate-900 text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider"
+                      >Sold Out</span
+                    >
+                  </div>
+                </div>
+                <div class="p-3">
+                  <p class="text-slate-400 text-[10px] font-bold uppercase mb-1">Makeup</p>
+                  <h4
+                    class="text-slate-400 dark:text-slate-500 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Velvet Matte Lipstick
+                  </h4>
+                  <div class="flex items-center">
+                    <span class="text-base font-extrabold text-slate-400">$22.00</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Product Card 4 -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Golden serum bottle"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmN-_fZkKQcowKxB_fTMYu2GdIm-3TpS1uIyO-G4AGY3gYWvilofVW_-H8yiUOoAUOKqo7eN4B_4TH83HXKfCa70eXN5bDMHFybok5n5fC0UGWk4wzBCcQS5hs1IOVL0bxfbROSRf7P1pOurj9Axg82KXjbf0tlz-AkldEKv15Dssn6M4c6uJqW2LyyS8A4JRlCRxxR0PdTLjPNcbskQvSmWdgWzphUyq_U4P6v0KIMXMDsQPQAs1zwZ4StdGzf49hLzIFZc1xwQ"
+                  />
+                </div>
+                <div class="p-3">
+                  <p class="text-primary text-[10px] font-bold uppercase mb-1">Skin Care</p>
+                  <h4
+                    class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Youthful Night Elixir
+                  </h4>
+                  <div class="flex items-center">
+                    <span class="text-base font-extrabold text-slate-900 dark:text-slate-100"
+                      >$64.00</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- Product Card 5 -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Pink minimalist perfume bottle"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuApm_bI1q4R36ldUGSl0WqUS-rt9D_bVFouXYEMLztFq7OunmNoh0zjAzwcD8xwLb1HOTbvxiL6NDUZj33m62zTLi5zWERwHze0txWfTy86HrNy-7JBfomajwWK5BGD9ljePLB9AzUd8L--2zvZzwMxvKWOphBDVr2-yCKEwS_0PvBFY6B6H4hZ3eoNQx9b00qEwRHB19TWhgc3SQ3E45VD3XrwRCWBdBuHz7cvMocPDC6tNqEfslHUjLNO7IgVaTbZGc-qblMQQw"
+                  />
+                </div>
+                <div class="p-3">
+                  <p class="text-primary text-[10px] font-bold uppercase mb-1">Fragrance</p>
+                  <h4
+                    class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Petal Whisper Perfume
+                  </h4>
+                  <div class="flex items-center">
+                    <span class="text-base font-extrabold text-slate-900 dark:text-slate-100"
+                      >$85.00</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- Product Card 6 -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Hair oil with wooden dropper"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSXKoVrmKUXtL5WekncE4yPdbrixOzllVdrEDRjdF-1RpL2d772DBPXBYvLPjsXELepK3_WuNSCtsBHGzGFeGKtkPLdYCuG51lpWeFyOPRFBoeuEteUHrnYVKu4hj0NV8NcOcE17aydFbLeQl6QvKS3NOqxvUbSzfJ4gXyK2sRPijs7Z10auJfpdHptrHZFFiL6G4NxFJtDjAjdD0PPFo6E3dsNhvUHNUQEsp4VbUo7mQksVrj8HrmtfaRydc6JI5vJb-NGtSbJw"
+                  />
+                </div>
+                <div class="p-3">
+                  <p class="text-primary text-[10px] font-bold uppercase mb-1">Hair Care</p>
+                  <h4
+                    class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Nourishing Argan Oil
+                  </h4>
+                  <div class="flex items-center">
+                    <span class="text-base font-extrabold text-slate-900 dark:text-slate-100"
+                      >$32.00</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- Repeat some cards to fill the row -->
+              <div
+                class="bg-white dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700 group hover:shadow-lg transition-all duration-300"
+              >
+                <div class="relative aspect-square overflow-hidden bg-slate-100">
+                  <img
+                    alt="Cosmetic bottle"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmN-_fZkKQcowKxB_fTMYu2GdIm-3TpS1uIyO-G4AGY3gYWvilofVW_-H8yiUOoAUOKqo7eN4B_4TH83HXKfCa70eXN5bDMHFybok5n5fC0UGWk4wzBCcQS5hs1IOVL0bxfbROSRf7P1pOurj9Axg82KXjbf0tlz-AkldEKv15Dssn6M4c6uJqW2LyyS8A4JRlCRxxR0PdTLjPNcbskQvSmWdgWzphUyq_U4P6v0KIMXMDsQPQAs1zwZ4StdGzf49hLzIFZc1xwQ"
+                  />
+                </div>
+                <div class="p-3">
+                  <p class="text-primary text-[10px] font-bold uppercase mb-1">Skin Care</p>
+                  <h4
+                    class="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2"
+                  >
+                    Daily Moisture Lotion
+                  </h4>
+                  <div class="flex items-center">
+                    <span class="text-base font-extrabold text-slate-900 dark:text-slate-100"
+                      >$24.00</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Pagination -->
+            <div class="mt-12 flex justify-center">
+              <nav class="flex items-center gap-1">
+                <button
+                  class="size-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-primary/10 hover:text-primary transition-all"
+                >
+                  <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button
+                  class="size-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold shadow-sm"
+                >
+                  1
+                </button>
+                <button
+                  class="size-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary font-medium transition-all"
+                >
+                  2
+                </button>
+                <button
+                  class="size-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary font-medium transition-all"
+                >
+                  3
+                </button>
+                <span class="px-2 text-slate-400">...</span>
+                <button
+                  class="size-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary font-medium transition-all"
+                >
+                  8
+                </button>
+                <button
+                  class="size-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:bg-primary/10 hover:text-primary transition-all"
+                >
+                  <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </main>
+      <!-- Footer -->
+      <footer class="bg-white dark:bg-slate-950 border-t border-primary/10 pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <div class="space-y-6">
+              <div class="flex items-center gap-2 text-primary">
+                <span class="material-symbols-outlined text-3xl">auto_awesome</span>
+                <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight">
+                  Hai Neo Shop
+                </h2>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                Discover the essence of natural beauty with our curated collection of ethical and
+                high-performance cosmetics.
+              </p>
+              <div class="flex items-center gap-4">
+                <a
+                  class="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all"
+                  href="#"
+                >
+                  <span class="material-symbols-outlined text-lg">public</span>
+                </a>
+                <a
+                  class="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all"
+                  href="#"
+                >
+                  <span class="material-symbols-outlined text-lg">photo_camera</span>
+                </a>
+                <a
+                  class="size-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-primary hover:text-white transition-all"
+                  href="#"
+                >
+                  <span class="material-symbols-outlined text-lg">play_arrow</span>
+                </a>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-slate-900 dark:text-slate-100 font-bold mb-6">Quick Links</h4>
+              <ul class="space-y-4">
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >Our Story</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >Shop All</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >New Arrivals</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >Beauty Blog</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-slate-900 dark:text-slate-100 font-bold mb-6">Customer Care</h4>
+              <ul class="space-y-4">
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >Track Order</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >Shipping Policy</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >Returns &amp; Refunds</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="text-slate-500 dark:text-slate-400 hover:text-primary text-sm transition-colors"
+                    href="#"
+                    >FAQ</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="text-slate-900 dark:text-slate-100 font-bold mb-6">Newsletter</h4>
+              <p class="text-slate-500 dark:text-slate-400 text-sm mb-4">
+                Subscribe to receive updates, access to exclusive deals, and more.
+              </p>
+              <form class="flex flex-col gap-3">
+                <input
+                  class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                  placeholder="Enter your email"
+                  type="email"
+                />
+                <button
+                  class="bg-primary text-white font-bold py-2 rounded-lg hover:bg-primary/90 transition-all text-sm"
+                >
+                  Subscribe
+                </button>
+              </form>
+            </div>
+          </div>
+          <div
+            class="border-t border-slate-100 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
+          >
+            <p class="text-slate-400 text-xs">© 2024 Hai Neo Shop. All rights reserved.</p>
+            <div class="flex gap-6">
+              <a class="text-slate-400 hover:text-primary text-xs transition-colors" href="#"
+                >Privacy Policy</a
+              >
+              <a class="text-slate-400 hover:text-primary text-xs transition-colors" href="#"
+                >Terms of Service</a
+              >
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -773,6 +773,10 @@ export interface Category {
    * Short description for category cards (e.g. in Shop By Categories block).
    */
   description?: string | null;
+  /**
+   * SVG icon shown next to the category name in the shop sidebar.
+   */
+  icon?: (number | null) | Media;
   image?: (number | null) | Media;
   /**
    * Tax classes for all products in this category (unless overridden at product level).
@@ -2366,6 +2370,7 @@ export interface NewsletterBlockSelect<T extends boolean = true> {
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  icon?: T;
   image?: T;
   taxClasses?: T;
   generateSlug?: T;
