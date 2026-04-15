@@ -1,80 +1,82 @@
-import type { Product, Variant } from '@/payload-types'
+'use client'
 
+import type { Product, SaleEvent } from '@/payload-types'
+
+import { ProductBadge } from '@/components/product/ProductBadge'
+import { Price } from '@/components/Price'
+import { SalePrice } from '@/components/SalePrice'
+import { calculateDiscountPercentage, getEffectivePrice } from '@/utilities/saleEvents'
+import { getPrimaryCategoryLabel, getProductPrimaryImage } from '@/utilities/product'
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import clsx from 'clsx'
-import { Media } from '@/components/Media'
-import { Price } from '@/components/Price'
-import { SaleBadge } from '@/components/SaleBadge'
-import { SalePrice } from '@/components/SalePrice'
-import { CountdownBadge } from '@/components/CountdownBadge'
-import { getEffectivePrice } from '@/utilities/saleEvents'
 
 type Props = {
-  product: Partial<Product>
+  product: Product
+  /** Defaults to "new" ribbon; use "bestSeller" or flash-sale "-X%". */
+  badge?: 'new' | 'bestSeller' | 'salePercent'
+  /** When set, sale prices resolve against these campaigns (e.g. linked flash event). */
+  campaigns?: SaleEvent[]
 }
 
-export const ProductGridItem: React.FC<Props> = ({ product }) => {
-  const { gallery, title } = product
+export const ProductGridItem: React.FC<Props> = ({ product, badge = 'new', campaigns = [] }) => {
+  const image = getProductPrimaryImage(product)
 
-  const priceInfo = getEffectivePrice(product)
-  const { price, originalPrice, isOnSale, saleEvent } = priceInfo
+  const priceInfo = getEffectivePrice(product, campaigns)
+  const { price, originalPrice, isOnSale } = priceInfo
+  const discountPct =
+    isOnSale && originalPrice != null && typeof price === 'number'
+      ? calculateDiscountPercentage(originalPrice, price)
+      : 0
+  const categoryLabel = getPrimaryCategoryLabel(product)
+  const slug = product.slug
 
-  const image =
-    gallery?.[0]?.image && typeof gallery[0]?.image !== 'string' ? gallery[0]?.image : false
+  if (!slug) return null
 
   return (
-    <Link className="relative inline-block h-full w-full group" href={`/products/${product.slug}`}>
-      <div className="relative">
-        {image ? (
-          <Media
-            className={clsx(
-              'relative aspect-square object-cover border rounded-2xl p-8 bg-primary-foreground',
-            )}
-            height={80}
-            imgClassName={clsx('h-full w-full object-cover rounded-2xl', {
-              'transition duration-300 ease-in-out group-hover:scale-102': true,
-            })}
-            resource={image}
-            width={80}
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:shadow-lg transition-all duration-300 cursor-pointer">
+      <Link href={`/products/${slug}`} className="relative block aspect-square overflow-hidden bg-slate-100">
+        {image?.url ? (
+          <Image
+            src={image.url}
+            alt={image.alt ?? product.title ?? ''}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
+        ) : (
+          <div className="h-full w-full bg-slate-100" />
+        )}
+        <ProductBadge badge={badge} discountPct={discountPct} isOnSale={isOnSale} />
+      </Link>
+      <div className="p-3">
+        {categoryLabel ? (
+          <p className="text-primary text-[10px] font-bold uppercase mb-1">{categoryLabel}</p>
         ) : null}
-        
-        {/* Sale Badge */}
-        {isOnSale && originalPrice && (
-          <SaleBadge
-            originalPrice={originalPrice}
-            salePrice={price}
-            variant="corner"
-          />
-        )}
-
-        {/* Countdown Timer Badge - Top Right */}
-        {isOnSale && saleEvent?.endsAt && (
-          <CountdownBadge endDate={saleEvent.endsAt} />
-        )}
-      </div>
-
-      <div className="font-mono text-primary/50 group-hover:text-primary flex justify-between items-center mt-4">
-        <div>{title}</div>
-
-        {typeof price === 'number' && (
-          <div className="">
+        <h3 className="text-slate-900 dark:text-slate-100 font-bold text-sm mb-2 line-clamp-2">
+          {product.title}
+        </h3>
+        {typeof price === 'number' ? (
+          <>
             {isOnSale && originalPrice ? (
               <SalePrice
                 salePrice={price}
                 originalPrice={originalPrice}
                 as="div"
-                className="flex-col items-end gap-0"
-                salePriceClassName="text-sm font-semibold"
-                originalPriceClassName="text-xs"
+                className="flex items-center gap-2"
+                salePriceClassName="text-base font-extrabold text-slate-900 dark:text-slate-100"
+                originalPriceClassName="text-sm text-slate-400 line-through"
               />
             ) : (
-              <Price amount={price} />
+              <Price
+                as="p"
+                amount={price}
+                className="text-base font-extrabold text-slate-900 dark:text-slate-100"
+              />
             )}
-          </div>
-        )}
+          </>
+        ) : null}
       </div>
-    </Link>
+    </article>
   )
 }

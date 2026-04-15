@@ -1,37 +1,26 @@
 'use client'
 
-import type { Category, Media, Product, SaleEvent } from '@/payload-types'
+import type { Product, SaleEvent } from '@/payload-types'
 
+import { ProductBadge } from '@/components/product/ProductBadge'
 import { Price } from '@/components/Price'
 import { SalePrice } from '@/components/SalePrice'
 import { calculateDiscountPercentage, getEffectivePrice } from '@/utilities/saleEvents'
+import { getPrimaryCategoryLabel, getProductPrimaryImage } from '@/utilities/product'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
 type Props = {
   product: Product
-  /** Defaults to "New" ribbon; use "bestSeller" or flash-sale "-X%". */
+  /** Defaults to "new" ribbon; use "bestSeller" or flash-sale "-X%". */
   badge?: 'new' | 'bestSeller' | 'salePercent'
   /** When set, sale prices resolve against these campaigns (e.g. linked flash event). */
   campaigns?: SaleEvent[]
 }
 
-function getPrimaryCategoryLabel(product: Product): string | null {
-  const first = product.categories?.[0]
-  if (!first || typeof first !== 'object') return null
-  const title = (first as Category).title
-  return typeof title === 'string' && title.trim() ? title : null
-}
-
-export const ProductCartItem: React.FC<Props> = ({
-  product,
-  badge = 'new',
-  campaigns = [],
-}) => {
-  const image = ((product.gallery && product.gallery[0] && typeof product.gallery[0] === 'object'
-    ? (product.gallery[0] as { image: Media }).image
-    : null) ?? product.meta?.image) as Media | null
+export const ProductCartItem: React.FC<Props> = ({ product, badge = 'new', campaigns = [] }) => {
+  const image = getProductPrimaryImage(product)
 
   const priceInfo = getEffectivePrice(product, campaigns)
   const { price, originalPrice, isOnSale } = priceInfo
@@ -58,34 +47,7 @@ export const ProductCartItem: React.FC<Props> = ({
         ) : (
           <div className="h-full w-full bg-muted" />
         )}
-        {badge === 'bestSeller' ? (
-          <span
-            className={
-              'absolute top-3 left-3 rounded-full bg-slate-900 px-2 py-1 ' +
-              'text-[10px] font-bold uppercase tracking-tighter text-white'
-            }
-          >
-            Best Seller
-          </span>
-        ) : badge === 'salePercent' ? (
-          <span
-            className={
-              'absolute top-3 left-3 rounded-full bg-red-500 px-2 py-1 ' +
-              'text-[10px] font-bold uppercase tracking-tighter text-primary-foreground'
-            }
-          >
-            {discountPct > 0 ? `-${discountPct}%` : 'Sale'}
-          </span>
-        ) : (
-          <span
-            className={
-              'absolute top-3 left-3 rounded-full bg-primary px-2 py-1 ' +
-              'text-[10px] font-bold uppercase tracking-tighter text-primary-foreground'
-            }
-          >
-            New
-          </span>
-        )}
+        <ProductBadge badge={badge} discountPct={discountPct} isOnSale={isOnSale} />
       </Link>
       <div className="space-y-2 p-4">
         {categoryLabel ? (

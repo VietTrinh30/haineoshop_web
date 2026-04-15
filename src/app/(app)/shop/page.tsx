@@ -1,6 +1,6 @@
 import { Grid } from '@/components/Grid'
 import { SortBy } from '@/components/layout/search/SortBy'
-import { ProductCartItem } from '@/components/product/ProductCartItem'
+import { ProductGridItem } from '@/components/ProductGridItem'
 import configPromise from '@payload-config'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getPayload } from 'payload'
@@ -70,6 +70,21 @@ export default async function ShopPage({ searchParams }: Props) {
 
   const hasFilters =
     searchValue || category || minPriceNum !== undefined || maxPriceNum !== undefined
+
+  const now = new Date().toISOString()
+  const activeCampaignsResult = await payload.find({
+    collection: 'sale-events',
+    where: {
+      and: [
+        { status: { not_equals: 'expired' } },
+        { startsAt: { less_than_equal: now } },
+        { endsAt: { greater_than_equal: now } },
+      ],
+    },
+    limit: 100,
+    depth: 1,
+  })
+  const activeCampaigns = activeCampaignsResult.docs
 
   const products = await payload.find({
     collection: 'products',
@@ -175,7 +190,7 @@ export default async function ShopPage({ searchParams }: Props) {
         <Grid className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
           {products.docs.map((product, index) => (
             <div key={product.id} className={getVisibilityClass(index)}>
-              <ProductCartItem product={product as any} />
+              <ProductGridItem product={product as any} campaigns={activeCampaigns} />
             </div>
           ))}
         </Grid>
