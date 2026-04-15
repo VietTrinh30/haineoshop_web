@@ -3,6 +3,8 @@ import type { GlobalConfig } from 'payload'
 import { adminOnly } from '@/access/adminOnly'
 
 export const DEFAULT_NEW_PRODUCT_DAYS = 30
+export const DEFAULT_PRICE_RANGE_MIN = 0
+export const DEFAULT_PRICE_RANGE_MAX = 500
 
 const optionalUrlValidation = (value: unknown) => {
   if (!value) return true
@@ -98,6 +100,36 @@ export const GeneralSettings: GlobalConfig = {
       validate: optionalUrlValidation,
       admin: {
         description: 'Shopee store URL (optional).',
+      },
+    },
+    {
+      name: 'priceRangeMin',
+      type: 'number',
+      required: true,
+      defaultValue: DEFAULT_PRICE_RANGE_MIN,
+      admin: {
+        description: 'Minimum price for the shop price range filter.',
+      },
+      validate: (value: unknown) => {
+        if (typeof value !== 'number' || value < 0) {
+          return 'Minimum price must be a non-negative number.'
+        }
+        return true
+      },
+    },
+    {
+      name: 'priceRangeMax',
+      type: 'number',
+      required: true,
+      defaultValue: DEFAULT_PRICE_RANGE_MAX,
+      admin: {
+        description: 'Maximum price for the shop price range filter.',
+      },
+      validate: (value: unknown) => {
+        if (typeof value !== 'number' || value <= 0) {
+          return 'Maximum price must be a positive number.'
+        }
+        return true
       },
     },
   ],

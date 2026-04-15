@@ -3130,6 +3130,14 @@ export interface GeneralSetting {
    * Shopee store URL (optional).
    */
   shopeePageLink?: string | null;
+  /**
+   * Minimum price for the shop price range filter.
+   */
+  priceRangeMin: number;
+  /**
+   * Maximum price for the shop price range filter.
+   */
+  priceRangeMax: number;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -3282,6 +3290,8 @@ export interface GeneralSettingsSelect<T extends boolean = true> {
   instagramPageLink?: T;
   tiktokPageLink?: T;
   shopeePageLink?: T;
+  priceRangeMin?: T;
+  priceRangeMax?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -15,8 +15,13 @@ type Props = {
 }
 
 export default async function ShopPage({ searchParams }: Props) {
-  const { q: searchValue, sort, category } = await searchParams
+  const { q: searchValue, sort, category, minPrice, maxPrice } = await searchParams
   const payload = await getPayload({ config: configPromise })
+
+  const minPriceNum = minPrice ? Number(minPrice) : undefined
+  const maxPriceNum = maxPrice ? Number(maxPrice) : undefined
+
+  const hasFilters = searchValue || category || minPriceNum !== undefined || maxPriceNum !== undefined
 
   const products = await payload.find({
     collection: 'products',
@@ -31,7 +36,7 @@ export default async function ShopPage({ searchParams }: Props) {
       saleEvents: true,
     },
     ...(sort ? { sort } : { sort: 'title' }),
-    ...(searchValue || category
+    ...(hasFilters
       ? {
           where: {
             and: [
@@ -66,6 +71,12 @@ export default async function ShopPage({ searchParams }: Props) {
                       },
                     },
                   ]
+                : []),
+              ...(minPriceNum !== undefined
+                ? [{ priceInVND: { greater_than_equal: minPriceNum } }]
+                : []),
+              ...(maxPriceNum !== undefined
+                ? [{ priceInVND: { less_than_equal: maxPriceNum } }]
                 : []),
             ],
           },
