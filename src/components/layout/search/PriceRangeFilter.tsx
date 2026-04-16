@@ -17,6 +17,7 @@ export function PriceRangeFilter({ min: MIN, max: MAX }: Props) {
 
   const [minVal, setMinVal] = useState(MIN)
   const [maxVal, setMaxVal] = useState(MAX)
+  const [activeThumb, setActiveThumb] = useState<'min' | 'max'>('max')
 
   useEffect(() => {
     const urlMin = Number(searchParams.get('minPrice') ?? MIN)
@@ -70,6 +71,15 @@ export function PriceRangeFilter({ min: MIN, max: MAX }: Props) {
     scheduleUpdate(minVal, val)
   }
 
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const pct = (e.clientX - rect.left) / rect.width
+    const val = MIN + Math.max(0, Math.min(1, pct)) * (MAX - MIN)
+    const distToMin = Math.abs(val - minVal)
+    const distToMax = Math.abs(val - maxVal)
+    setActiveThumb(distToMin <= distToMax ? 'min' : 'max')
+  }
+
   const minPct = ((minVal - MIN) / (MAX - MIN)) * 100
   const maxPct = ((maxVal - MIN) / (MAX - MIN)) * 100
 
@@ -77,7 +87,7 @@ export function PriceRangeFilter({ min: MIN, max: MAX }: Props) {
     <div>
       <h3 className="text-slate-900 dark:text-slate-100 text-lg font-bold mb-4">Price Range</h3>
       <div className="px-2">
-        <div className="relative h-1 bg-slate-200 dark:bg-slate-700 rounded-full mb-6">
+        <div className="relative h-1 bg-slate-200 dark:bg-slate-700 rounded-full mb-6" onPointerMove={handlePointerMove}>
           {/* Active track */}
           <div
             className="absolute h-full bg-primary rounded-full"
@@ -104,7 +114,7 @@ export function PriceRangeFilter({ min: MIN, max: MAX }: Props) {
             value={minVal}
             onChange={handleMinChange}
             className="absolute inset-0 w-full h-4 -top-1.5 opacity-0 cursor-pointer"
-            style={{ zIndex: minVal > MAX - 10 ? 5 : 3 }}
+            style={{ zIndex: activeThumb === 'min' ? 5 : 3 }}
           />
 
           {/* Max range input (invisible, interactive) */}
@@ -115,7 +125,7 @@ export function PriceRangeFilter({ min: MIN, max: MAX }: Props) {
             value={maxVal}
             onChange={handleMaxChange}
             className="absolute inset-0 w-full h-4 -top-1.5 opacity-0 cursor-pointer"
-            style={{ zIndex: 4 }}
+            style={{ zIndex: activeThumb === 'max' ? 5 : 3 }}
           />
         </div>
 
