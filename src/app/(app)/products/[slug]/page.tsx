@@ -1,15 +1,14 @@
-import type { Media, Product } from '@/payload-types'
+import type { Media, Product, SaleEvent } from '@/payload-types'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
-import { GridTileImage } from '@/components/Grid/tile'
+import { RichText } from '@/components/RichText'
 import { Gallery } from '@/components/product/Gallery'
+import { ProductBreadcrumb } from '@/components/product/ProductBreadcrumb'
 import { ProductDescription } from '@/components/product/ProductDescription'
-import { Button } from '@/components/ui/button'
+import { YouMayAlsoLike } from '@/components/product/YouMayAlsoLike'
 import configPromise from '@payload-config'
-import { ChevronLeftIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import { draftMode } from 'next/headers'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 import React, { Suspense } from 'react'
@@ -65,6 +64,8 @@ export default async function ProductPage({ params }: Args) {
 
   if (!product) return notFound()
 
+  const payload = await getPayload({ config: configPromise })
+
   const gallery =
     product.gallery
       ?.filter((item) => typeof item.image === 'object')
@@ -74,12 +75,21 @@ export default async function ProductPage({ params }: Args) {
       })) || []
 
   const metaImage = typeof product.meta?.image === 'object' ? product.meta?.image : undefined
-  const hasStock = product.enableVariants
-    ? product?.variants?.docs?.some((variant) => {
-        if (typeof variant !== 'object') return false
-        return variant.inventory && variant?.inventory > 0
-      })
-    : product.inventory! > 0
+
+  const now = new Date().toISOString()
+  const activeCampaignsResult = await payload.find({
+    collection: 'sale-events',
+    where: {
+      and: [
+        { status: { not_equals: 'expired' } },
+        { startsAt: { less_than_equal: now } },
+        { endsAt: { greater_than_equal: now } },
+      ],
+    },
+    limit: 100,
+    depth: 1,
+  })
+  const activeCampaigns = activeCampaignsResult.docs as SaleEvent[]
 
   let price = product.priceInVND ?? 0
 
@@ -102,7 +112,7 @@ export default async function ProductPage({ params }: Args) {
     image: metaImage?.url,
     offers: {
       '@type': 'AggregateOffer',
-      availability: hasStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability: 'https://schema.org/InStock',
       price: price,
       priceCurrency: 'VND',
     },
@@ -110,6 +120,11 @@ export default async function ProductPage({ params }: Args) {
 
   const relatedProducts =
     product.relatedProducts?.filter((relatedProduct) => typeof relatedProduct === 'object') ?? []
+
+  const featuredVideo =
+    typeof product.featuredVideo === 'object' && product.featuredVideo
+      ? (product.featuredVideo as Media)
+      : undefined
 
   return (
     <React.Fragment>
@@ -119,70 +134,47 @@ export default async function ProductPage({ params }: Args) {
         }}
         type="application/ld+json"
       />
+
       <div className="container pt-8 pb-8">
-        <Button asChild variant="ghost" className="mb-4">
-          <Link href="/shop">
-            <ChevronLeftIcon />
-            All products
-          </Link>
-        </Button>
-        <div className="flex flex-col gap-12 rounded-lg border p-8 md:py-12 lg:flex-row lg:gap-8 bg-primary-foreground">
+        <ProductBreadcrumb product={product} />
+
+        <div className="flex flex-col gap-12 rounded-lg lg:flex-row lg:gap-8">
           <div className="h-full w-full basis-full lg:basis-1/2">
             <Suspense
               fallback={
                 <div className="relative aspect-square h-full max-h-137.5 w-full overflow-hidden" />
               }
             >
-              {Boolean(gallery?.length) && <Gallery gallery={gallery} />}
+              {Boolean(gallery?.length) && <Gallery gallery={gallery} video={featuredVideo} />}
             </Suspense>
           </div>
 
           <div className="basis-full lg:basis-1/2">
-            <ProductDescription product={product} />
+            <ProductDescription product={product} activeCampaigns={activeCampaigns} />
           </div>
         </div>
       </div>
 
-      {product.layout?.length ? <RenderBlocks blocks={product.layout} /> : <></>}
+      {product.description && (
+        <div className="container py-12 px-5 flex flex-col gap-1 border-t border-border mt-12">
+          <h2 className="text-xl font-semibold uppercase tracking-widest mb-6">
+            Product Information
+          </h2>
+          <RichText data={product.description} enableGutter={false} />
+        </div>
+      )}
+
+      {product.layout?.length ? <RenderBlocks blocks={product.layout} /> : null}
 
       {relatedProducts.length ? (
-        <div className="container">
-          <RelatedProducts products={relatedProducts as Product[]} />
+        <div className="container pb-12">
+          <YouMayAlsoLike products={relatedProducts as Product[]} activeCampaigns={activeCampaigns} />
         </div>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </React.Fragment>
   )
 }
 
-function RelatedProducts({ products }: { products: Product[] }) {
-  if (!products.length) return null
-
-  return (
-    <div className="py-8">
-      <h2 className="mb-4 text-2xl font-bold">Related Products</h2>
-      <ul className="flex w-full gap-4 overflow-x-auto pt-1">
-        {products.map((product) => (
-          <li
-            className="aspect-square w-full flex-none min-[475px]:w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5"
-            key={product.id}
-          >
-            <Link className="relative h-full w-full" href={`/products/${product.slug}`}>
-              <GridTileImage
-                label={{
-                  amount: product.priceInVND ?? 0,
-                  title: product.title,
-                }}
-                media={product.meta?.image as Media}
-              />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
 
 const queryProductBySlug = async ({ slug }: { slug: string }) => {
   const { isEnabled: draft } = await draftMode()
@@ -206,7 +198,6 @@ const queryProductBySlug = async ({ slug }: { slug: string }) => {
         ...(draft ? [] : [{ _status: { equals: 'published' } }]),
       ],
     },
-    // Rely on defaultPopulate which includes saleEvents: true
   })
 
   return result.docs?.[0] || null

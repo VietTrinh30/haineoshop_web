@@ -1,10 +1,11 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import type { Product } from '@/payload-types'
+import type { Product, Variant } from '@/payload-types'
 
+import { Price } from '@/components/Price'
 import { createUrl } from '@/utilities/createUrl'
-import clsx from 'clsx'
+import { cn } from '@/utilities/cn'
+import { CheckCircle2 } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React from 'react'
 
@@ -22,101 +23,80 @@ export function VariantSelector({ product }: { product: Product }) {
 
   return variantTypes?.map((type) => {
     if (!type || typeof type !== 'object') {
-      return <></>
+      return <React.Fragment key="empty" />
     }
 
     const options = type.options?.docs
 
     if (!options || !Array.isArray(options) || !options.length) {
-      return <></>
+      return <React.Fragment key="empty-opts" />
     }
 
     return (
-      <dl className="" key={type.id}>
-        <dt className="mb-4 text-sm">{type.label}</dt>
-        <dd className="flex flex-wrap gap-3">
-          <React.Fragment>
-            {options?.map((option) => {
-              if (!option || typeof option !== 'object') {
-                return <></>
-              }
+      <div className="flex flex-wrap gap-3" key={type.id}>
+        {options.map((option) => {
+          if (!option || typeof option !== 'object') {
+            return <React.Fragment key="empty-opt" />
+          }
 
-              const optionID = option.id
-              const optionKeyLowerCase = type.name
+          const optionID = option.id
+          const optionKeyLowerCase = type.name
 
-              // Base option params on current params so we can preserve any other param state in the url.
-              const optionSearchParams = new URLSearchParams(searchParams.toString())
+          const optionSearchParams = new URLSearchParams(searchParams.toString())
+          optionSearchParams.delete('variant')
+          optionSearchParams.delete('image')
+          optionSearchParams.set(optionKeyLowerCase, String(optionID))
 
-              // Remove image and variant ID from this search params so we can loop over it safely.
-              optionSearchParams.delete('variant')
-              optionSearchParams.delete('image')
+          const currentOptions = Array.from(optionSearchParams.values())
 
-              // Update the option params using the current option to reflect how the url *would* change,
-              // if the option was clicked.
-              optionSearchParams.set(optionKeyLowerCase, String(optionID))
+          let matchingVariant: Variant | undefined
 
-              const currentOptions = Array.from(optionSearchParams.values())
+          if (variants) {
+            matchingVariant = variants
+              .filter((v): v is Variant => typeof v === 'object')
+              .find((v) => {
+                if (!v.options || !Array.isArray(v.options)) return false
+                return v.options.every((vo) => {
+                  if (typeof vo !== 'object') return currentOptions.includes(String(vo))
+                  return currentOptions.includes(String(vo.id))
+                })
+              })
 
-              let isAvailableForSale = true
+            if (matchingVariant) {
+              optionSearchParams.set('variant', String(matchingVariant.id))
+            }
+          }
 
-              // Find a matching variant
-              if (variants) {
-                const matchingVariant = variants
-                  .filter((variant) => typeof variant === 'object')
-                  .find((variant) => {
-                    if (!variant.options || !Array.isArray(variant.options)) return false
+          const optionUrl = createUrl(pathname, optionSearchParams)
+          const isActive = searchParams.get(optionKeyLowerCase) === String(optionID)
 
-                    // Check if all variant options match the current options in the URL
-                    return variant.options.every((variantOption) => {
-                      if (typeof variantOption !== 'object')
-                        return currentOptions.includes(String(variantOption))
+          const variantPrice = matchingVariant?.priceInVND ?? null
 
-                      return currentOptions.includes(String(variantOption.id))
-                    })
-                  })
-
-                if (matchingVariant) {
-                  // If we found a matching variant, set the variant ID in the search params.
-                  optionSearchParams.set('variant', String(matchingVariant.id))
-
-                  if (matchingVariant.inventory && matchingVariant.inventory > 0) {
-                    isAvailableForSale = true
-                  } else {
-                    isAvailableForSale = false
-                  }
-                }
-              }
-
-              const optionUrl = createUrl(pathname, optionSearchParams)
-
-              // The option is active if it's in the url params.
-              const isActive =
-                Boolean(isAvailableForSale) &&
-                searchParams.get(optionKeyLowerCase) === String(optionID)
-
-              return (
-                <Button
-                  variant={'ghost'}
-                  aria-disabled={!isAvailableForSale}
-                  className={clsx('px-2', {
-                    'bg-primary/5 text-primary': isActive,
-                  })}
-                  disabled={!isAvailableForSale}
-                  key={option.id}
-                  onClick={() => {
-                    router.replace(`${optionUrl}`, {
-                      scroll: false,
-                    })
-                  }}
-                  title={`${option.label} ${!isAvailableForSale ? ' (Out of Stock)' : ''}`}
-                >
-                  {option.label}
-                </Button>
-              )
-            })}
-          </React.Fragment>
-        </dd>
-      </dl>
+          return (
+            <button
+              key={option.id}
+              type="button"
+              title={option.label}
+              onClick={() => router.replace(optionUrl, { scroll: false })}
+              className={cn(
+                'relative flex min-w-[100px] flex-col items-start rounded-lg border px-4 py-3 text-left transition-colors',
+                'hover:border-primary/50',
+                isActive ? 'border-primary bg-primary/5' : 'border-border bg-background',
+              )}
+            >
+              {isActive && (
+                <CheckCircle2 className="absolute right-2 top-2 size-4 fill-primary text-white" />
+              )}
+              <span className="text-sm font-medium">{option.label}</span>
+              {variantPrice != null && (
+                <span className="text-xs text-muted-foreground mt-0.5">
+                  <Price amount={variantPrice} />
+                </span>
+              )}
+            </button>
+          )
+        })}
+      </div>
     )
   })
 }

@@ -165,8 +165,13 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     gallery: true,
     featuredVideo: true,
     priceInVND: true,
-    inventory: true,
     meta: true,
+    sku: true,
+    brand: true,
+    origin: true,
+    isTopSelling: true,
+    categories: true,
+    subcategories: true,
   },
   fields: [
     { name: 'title', type: 'text', required: true },
@@ -321,6 +326,27 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               }
               return field
             }),
+            {
+              name: 'sku',
+              type: 'text',
+              label: 'SKU',
+              required: false,
+              admin: {
+                description: 'Stock keeping unit identifier (e.g. HN-S-NIGHT-30).',
+              },
+            },
+            {
+              name: 'brand',
+              type: 'text',
+              label: 'Brand',
+              required: false,
+            },
+            {
+              name: 'origin',
+              type: 'text',
+              label: 'Country of Origin',
+              required: false,
+            },
             {
               name: 'hotDealPrice',
               type: 'number',

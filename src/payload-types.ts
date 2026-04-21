@@ -393,6 +393,12 @@ export interface Product {
    */
   priceInVND?: number | null;
   /**
+   * Stock keeping unit identifier (e.g. HN-S-NIGHT-30).
+   */
+  sku?: string | null;
+  brand?: string | null;
+  origin?: string | null;
+  /**
    * Set a Hot Deal sale price (VND). When present, this price is shown instead of the regular price. A product with a Hot Deal price cannot be added to any active or scheduled sale event.
    */
   hotDealPrice?: number | null;
@@ -2728,6 +2734,9 @@ export interface ProductsSelect<T extends boolean = true> {
   variants?: T;
   priceInVNDEnabled?: T;
   priceInVND?: T;
+  sku?: T;
+  brand?: T;
+  origin?: T;
   hotDealPrice?: T;
   isTopSelling?: T;
   topSellingOrder?: T;
