@@ -30,6 +30,16 @@ import {
 
 export const ProductsCollection: CollectionOverride = ({ defaultCollection }) => ({
   ...defaultCollection,
+  versions: {
+    ...(typeof defaultCollection?.versions === 'object' ? defaultCollection.versions : {}),
+    drafts: {
+      ...(typeof defaultCollection?.versions === 'object' &&
+      typeof defaultCollection.versions?.drafts === 'object'
+        ? defaultCollection.versions.drafts
+        : {}),
+      autosave: false,
+    },
+  },
   hooks: {
     ...(defaultCollection?.hooks ?? {}),
     beforeValidate: [
