@@ -32,13 +32,11 @@ export const ProductItem: React.FC<Props> = ({ product, quantity, variant, curre
 
   if (isVariant) {
     const imageVariant = product.gallery?.find((item) => {
-      if (!item.variantOption) return false
-      const variantOptionID =
-        typeof item.variantOption === 'object' ? item.variantOption.id : item.variantOption
+      if (!item.variantOptionId) return false
 
-      const hasMatch = variant?.options?.some((option) => {
-        if (typeof option === 'object') return option.id === variantOptionID
-        else return option === variantOptionID
+      const optionsArray = variant?.options as any[] | undefined
+      const hasMatch = optionsArray?.some((option: any) => {
+        return option.optionId === item.variantOptionId
       })
 
       return hasMatch
@@ -53,8 +51,20 @@ export const ProductItem: React.FC<Props> = ({ product, quantity, variant, curre
   const { price: effectivePrice, originalPrice, isOnSale } = priceInfo
 
   // Use variant price if available, otherwise use effective price from sale calculation
-  const itemPrice = variant?.priceInVND ? variant.priceInVND : effectivePrice
-  const itemOriginalPrice = variant?.priceInVND ? variant.priceInVND : originalPrice
+  let itemPrice = variant?.priceInVND ? variant.priceInVND : effectivePrice
+  let itemOriginalPrice = variant?.priceInVND ? variant.priceInVND : originalPrice
+  let itemIsOnSale = isOnSale && !variant
+
+  // Check variant hot deal price
+  if (variant && typeof variant === 'object') {
+    const variantHotDeal = (variant as any)?.hotDealPrice
+    if (typeof variantHotDeal === 'number' && variantHotDeal > 0 && variantHotDeal < (variant.priceInVND || 0)) {
+      itemPrice = variantHotDeal
+      itemOriginalPrice = variant.priceInVND || 0
+      itemIsOnSale = true
+    }
+  }
+
   const itemURL = `/products/${product.slug}${variant ? `?variant=${variant.id}` : ''}`
 
   return (
@@ -66,8 +76,8 @@ export const ProductItem: React.FC<Props> = ({ product, quantity, variant, curre
           )}
         </div>
 
-        {/* Sale Badge for non-variant products */}
-        {!variant && isOnSale && itemOriginalPrice && (
+        {/* Sale Badge for products on sale (including variant hot deals) */}
+        {itemIsOnSale && itemOriginalPrice && (
           <SaleBadge
             originalPrice={itemOriginalPrice}
             salePrice={itemPrice}
@@ -83,11 +93,9 @@ export const ProductItem: React.FC<Props> = ({ product, quantity, variant, curre
           </p>
           {variant && (
             <p className="text-sm font-mono text-primary/50 tracking-widest">
-              {variant.options
-                ?.map((option) => {
-                  if (typeof option === 'object') return option.label
-                  return null
-                })
+              {(variant.options as any[])
+                ?.map((option: any) => option.label)
+                .filter(Boolean)
                 .join(', ')}
             </p>
           )}
@@ -100,7 +108,7 @@ export const ProductItem: React.FC<Props> = ({ product, quantity, variant, curre
         {itemPrice && quantity && (
           <div className="text-right">
             <p className="font-medium text-lg">Subtotal</p>
-            {!variant && isOnSale && itemOriginalPrice ? (
+            {itemIsOnSale && itemOriginalPrice ? (
               <SalePrice
                 salePrice={itemPrice * quantity}
                 originalPrice={itemOriginalPrice * quantity}

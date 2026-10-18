@@ -113,6 +113,7 @@ export interface Config {
     };
     products: {
       variants: 'variants';
+      joinedVariants: 'variants';
     };
   };
   collectionsSelect: {
@@ -370,7 +371,10 @@ export interface Product {
   gallery?:
     | {
         image: number | Media;
-        variantOption?: (number | null) | VariantOption;
+        /**
+         * The ID of the option from the first variant type. Example: "o1"
+         */
+        variantOptionId?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -379,6 +383,20 @@ export interface Product {
    */
   featuredVideo?: (number | null) | Media;
   layout?: (CallToActionBlock | ContentBlock | MediaBlock)[] | null;
+  /**
+   * Stock keeping unit identifier (e.g. HN-S-NIGHT-30).
+   */
+  sku?: string | null;
+  brand?: string | null;
+  origin?: string | null;
+  /**
+   * Enable to include this product in top-selling listings.
+   */
+  isTopSelling?: boolean | null;
+  /**
+   * Lower numbers are displayed first (1 appears before 2).
+   */
+  topSellingOrder?: number | null;
   inventory?: number | null;
   enableVariants?: boolean | null;
   variantTypes?: (number | VariantType)[] | null;
@@ -393,23 +411,30 @@ export interface Product {
    */
   priceInVND?: number | null;
   /**
-   * Stock keeping unit identifier (e.g. HN-S-NIGHT-30).
-   */
-  sku?: string | null;
-  brand?: string | null;
-  origin?: string | null;
-  /**
    * Set a Hot Deal sale price (VND). When present, this price is shown instead of the regular price. A product with a Hot Deal price cannot be added to any active or scheduled sale event.
    */
   hotDealPrice?: number | null;
+  variantTypeDefs?:
+    | {
+        label: string;
+        options?:
+          | {
+              label: string;
+              image?: (number | null) | Media;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
-   * Enable to include this product in top-selling listings.
+   * Auto-generated variants based on your options above. Save the product to refresh this list.
    */
-  isTopSelling?: boolean | null;
-  /**
-   * Lower numbers are displayed first (1 appears before 2).
-   */
-  topSellingOrder?: number | null;
+  joinedVariants?: {
+    docs?: (number | Variant)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   relatedProducts?: (number | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -471,40 +496,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantOptions".
- */
-export interface VariantOption {
-  id: number;
-  _variantOptions_options_order?: string | null;
-  variantType: number | VariantType;
-  label: string;
-  /**
-   * should be defaulted or dynamic based on label
-   */
-  value: string;
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantTypes".
- */
-export interface VariantType {
-  id: number;
-  label: string;
-  name: string;
-  options?: {
-    docs?: (number | VariantOption)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1397,6 +1388,40 @@ export interface NewsletterBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variantTypes".
+ */
+export interface VariantType {
+  id: number;
+  label: string;
+  name: string;
+  options?: {
+    docs?: (number | VariantOption)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "variantOptions".
+ */
+export interface VariantOption {
+  id: number;
+  _variantOptions_options_order?: string | null;
+  variantType: number | VariantType;
+  label: string;
+  /**
+   * should be defaulted or dynamic based on label
+   */
+  value: string;
+  updatedAt: string;
+  createdAt: string;
+  deletedAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "variants".
  */
 export interface Variant {
@@ -1406,10 +1431,22 @@ export interface Variant {
    */
   title?: string | null;
   product: number | Product;
-  options: (number | VariantOption)[];
+  options:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   inventory?: number | null;
   priceInVNDEnabled?: boolean | null;
   priceInVND?: number | null;
+  /**
+   * Hot Deal price for this variant. When set, displayed as sale price with percent discount.
+   */
+  hotDealPrice?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -2676,6 +2713,7 @@ export interface VariantsSelect<T extends boolean = true> {
   inventory?: T;
   priceInVNDEnabled?: T;
   priceInVND?: T;
+  hotDealPrice?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -2717,7 +2755,7 @@ export interface ProductsSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
-        variantOption?: T;
+        variantOptionId?: T;
         id?: T;
       };
   featuredVideo?: T;
@@ -2728,18 +2766,32 @@ export interface ProductsSelect<T extends boolean = true> {
         content?: T | ContentBlockSelect<T>;
         mediaBlock?: T | MediaBlockSelect<T>;
       };
+  sku?: T;
+  brand?: T;
+  origin?: T;
+  isTopSelling?: T;
+  topSellingOrder?: T;
   inventory?: T;
   enableVariants?: T;
   variantTypes?: T;
   variants?: T;
   priceInVNDEnabled?: T;
   priceInVND?: T;
-  sku?: T;
-  brand?: T;
-  origin?: T;
   hotDealPrice?: T;
-  isTopSelling?: T;
-  topSellingOrder?: T;
+  variantTypeDefs?:
+    | T
+    | {
+        label?: T;
+        options?:
+          | T
+          | {
+              label?: T;
+              image?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  joinedVariants?: T;
   relatedProducts?: T;
   meta?:
     | T

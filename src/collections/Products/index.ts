@@ -11,6 +11,7 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
+import { generateVariants } from '@/hooks/products/generateVariants'
 import {
   FixedToolbarFeature,
   HeadingFeature,
@@ -42,6 +43,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
   },
   hooks: {
     ...(defaultCollection?.hooks ?? {}),
+    afterChange: [...(defaultCollection?.hooks?.afterChange ?? []), generateVariants],
     beforeValidate: [
       ...(defaultCollection?.hooks?.beforeValidate ?? []),
       // Validate subcategory <-> category membership
@@ -169,7 +171,7 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
     title: true,
     slug: true,
     description: true,
-    variantOptions: true,
+    variantTypeDefs: true,
     variants: true,
     enableVariants: true,
     gallery: true,
@@ -219,46 +221,14 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   required: true,
                 },
                 {
-                  name: 'variantOption',
-                  type: 'relationship',
-                  relationTo: 'variantOptions',
+                  name: 'variantOptionId',
+                  type: 'text',
+                  label: 'Variant Option',
                   admin: {
+                    description: 'The ID of the option from the first variant type. Example: "o1"',
                     condition: (data) => {
-                      return data?.enableVariants === true && data?.variantTypes?.length > 0
+                      return data?.enableVariants === true && data?.variantTypeDefs?.length > 0
                     },
-                  },
-                  filterOptions: ({ data }) => {
-                    if (data?.enableVariants && data?.variantTypes?.length) {
-                      const variantTypeIDs = data.variantTypes.map(
-                        (item: string | number | { id: string | number }) => {
-                          if (typeof item === 'object' && item?.id) {
-                            return item.id
-                          }
-                          return item
-                        },
-                      ) as DefaultDocumentIDType[]
-
-                      if (variantTypeIDs.length === 0)
-                        return {
-                          variantType: {
-                            in: [],
-                          },
-                        }
-
-                      const query: Where = {
-                        variantType: {
-                          in: variantTypeIDs,
-                        },
-                      }
-
-                      return query
-                    }
-
-                    return {
-                      variantType: {
-                        in: [],
-                      },
-                    }
                   },
                 },
               ],
@@ -290,13 +260,72 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
         },
         {
           fields: [
+            // ── Group 1: Product Identity ──
+            {
+              name: 'sku',
+              type: 'text',
+              label: 'SKU',
+              required: false,
+              admin: {
+                description: 'Stock keeping unit identifier (e.g. HN-S-NIGHT-30).',
+              },
+            },
+            {
+              name: 'brand',
+              type: 'text',
+              label: 'Brand',
+              required: false,
+            },
+            {
+              name: 'origin',
+              type: 'text',
+              label: 'Country of Origin',
+              required: false,
+            },
+            {
+              name: 'isTopSelling',
+              type: 'checkbox',
+              label: 'Top Selling Product',
+              defaultValue: false,
+              admin: {
+                description: 'Enable to include this product in top-selling listings.',
+              },
+            },
+            {
+              name: 'topSellingOrder',
+              type: 'number',
+              label: 'Top Selling Display Order',
+              admin: {
+                condition: (data) => data?.isTopSelling === true,
+                description: 'Lower numbers are displayed first (1 appears before 2).',
+              },
+              validate: (
+                value: unknown,
+                { siblingData }: { siblingData?: { isTopSelling?: boolean } },
+              ) => {
+                if (!siblingData?.isTopSelling) return true
+                if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
+                  return 'Display order is required and must be a positive whole number when Top Selling is enabled.'
+                }
+                return true
+              },
+            },
+
+            // ── Group 2: Pricing & Inventory ──
             ...defaultCollection.fields.map(function fixFields(field: Field): Field {
+              if ('name' in field && field.name === 'inventory') {
+                return deepMerge(field, {
+                  admin: {
+                    condition: (data: any) => !data?.enableVariants,
+                  },
+                })
+              }
               if ('name' in field && field.name === 'priceInVND') {
                 const newField = deepMerge(field, {
                   label: 'Price (VND)',
                   admin: {
                     description: 'Price in VND (e.g. 500000).',
-                    condition: () => true, // Always show the price input
+                    condition: (data: any) => !data?.enableVariants,
                     width: '100%',
                   },
                 })
@@ -304,6 +333,14 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
                   delete newField.admin.components.Field
                 }
                 return newField
+              }
+              if ('name' in field && field.name === 'variantTypes') {
+                return deepMerge(field, {
+                  admin: {
+                    hidden: true,
+                  },
+                  required: false,
+                })
               }
               if ('name' in field && field.name === 'priceInVNDEnabled') {
                 return deepMerge(field, {
@@ -337,64 +374,85 @@ export const ProductsCollection: CollectionOverride = ({ defaultCollection }) =>
               return field
             }),
             {
-              name: 'sku',
-              type: 'text',
-              label: 'SKU',
-              required: false,
-              admin: {
-                description: 'Stock keeping unit identifier (e.g. HN-S-NIGHT-30).',
-              },
-            },
-            {
-              name: 'brand',
-              type: 'text',
-              label: 'Brand',
-              required: false,
-            },
-            {
-              name: 'origin',
-              type: 'text',
-              label: 'Country of Origin',
-              required: false,
-            },
-            {
               name: 'hotDealPrice',
               type: 'number',
               label: 'Hot Deal Price (VND)',
               required: false,
               admin: {
+                condition: (data) => !data?.enableVariants,
                 description:
                   'Set a Hot Deal sale price (VND). When present, this price is shown instead of the regular price. A product with a Hot Deal price cannot be added to any active or scheduled sale event.',
               },
             },
+
+            // ── Group 3: Variant Configuration ──
             {
-              name: 'isTopSelling',
-              type: 'checkbox',
-              label: 'Top Selling Product',
-              defaultValue: false,
+              name: 'variantTypeDefs',
+              type: 'array',
+              label: 'Variant Types',
               admin: {
-                description: 'Enable to include this product in top-selling listings.',
+                condition: (data) => Boolean(data?.enableVariants),
+              },
+              fields: [
+                {
+                  name: 'label',
+                  type: 'text',
+                  required: true,
+                },
+                {
+                  name: 'options',
+                  type: 'array',
+                  label: 'Options',
+                  minRows: 1,
+                  fields: [
+                    {
+                      name: 'label',
+                      type: 'text',
+                      required: true,
+                    },
+                    {
+                      name: 'image',
+                      type: 'upload',
+                      relationTo: 'media',
+                      admin: {
+                        condition: (_data: any, _siblingData: any, { path }: { path?: (string | number)[] }) => {
+                          // path is like ['variantTypeDefs', 0, 'options', 0, 'image']
+                          // We want to show image only for index 0 of variantTypeDefs
+                          if (!path || !Array.isArray(path)) return false
+                          // path[1] is the variant type index
+                          const typeIndex = path[1]
+                          return String(typeIndex) === '0'
+                        },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: 'autoRefreshVariants',
+              type: 'ui',
+              admin: {
+                condition: (data) => Boolean(data?.enableVariants),
+                components: {
+                  Field: '@/components/admin/AutoRefreshVariants#AutoRefreshVariants',
+                },
               },
             },
             {
-              name: 'topSellingOrder',
-              type: 'number',
-              label: 'Top Selling Display Order',
+              name: 'joinedVariants',
+              type: 'join',
+              collection: 'variants',
+              on: 'product',
+              label: 'Variants',
               admin: {
-                condition: (data) => data?.isTopSelling === true,
-                description: 'Lower numbers are displayed first (1 appears before 2).',
-              },
-              validate: (
-                value: unknown,
-                { siblingData }: { siblingData?: { isTopSelling?: boolean } },
-              ) => {
-                if (!siblingData?.isTopSelling) return true
-                if (typeof value !== 'number' || !Number.isInteger(value) || value <= 0) {
-                  return 'Display order is required and must be a positive whole number when Top Selling is enabled.'
-                }
-                return true
+                condition: (data) => Boolean(data?.enableVariants),
+                defaultColumns: ['title', 'priceInVND', 'hotDealPrice', 'inventory', '_status'],
+                description: 'Auto-generated variants based on your options above. Save the product to refresh this list.',
               },
             },
+
+            // ── Group 4: Related ──
             {
               name: 'relatedProducts',
               type: 'relationship',

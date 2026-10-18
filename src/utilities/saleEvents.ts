@@ -1,4 +1,4 @@
-import type { Product, SaleEvent } from '@/payload-types'
+import type { Product, SaleEvent, Variant } from '@/payload-types'
 
 /**
  * Find the active sale event (campaign) for a given product ID from a list of
@@ -53,10 +53,13 @@ export function calculateDiscountPercentage(originalPrice: number, salePrice: nu
  * Pass fetched campaigns from the server — the product itself no longer embeds sale events.
  *
  * With VND currency (decimals: 0), priceInVND is stored as-is (no ×100 factor).
+ *
+ * When a variant is provided, its priceInVND and hotDealPrice are used instead of the product's.
  */
 export function getEffectivePrice(
   product: Partial<Product>,
   campaigns: SaleEvent[] = [],
+  variant?: Partial<Variant> | null,
 ): {
   price: number
   originalPrice?: number
@@ -66,17 +69,44 @@ export function getEffectivePrice(
 } {
   let basePrice = product.priceInVND ?? 0
 
-  // Handle variants
-  const variants = product.variants?.docs
-  if (variants && variants.length > 0) {
-    const variant = variants[0]
-    if (
-      variant &&
-      typeof variant === 'object' &&
-      variant?.priceInVND &&
-      typeof variant.priceInVND === 'number'
-    ) {
-      basePrice = variant.priceInVND
+  // If a specific variant is provided, use its price
+  if (variant && typeof variant === 'object' && typeof variant.priceInVND === 'number') {
+    basePrice = variant.priceInVND
+
+    // Check variant-level hot deal price
+    const variantHotDeal = (variant as Variant & { hotDealPrice?: number | null }).hotDealPrice
+    if (typeof variantHotDeal === 'number' && variantHotDeal > 0 && variantHotDeal < basePrice) {
+      return {
+        price: variantHotDeal,
+        originalPrice: basePrice,
+        isOnSale: true,
+        isHotDeal: true,
+      }
+    }
+  } else {
+    // Handle variants — use first variant's price as fallback
+    const variants = product.variants?.docs
+    if (variants && variants.length > 0) {
+      const firstVariant = variants[0]
+      if (
+        firstVariant &&
+        typeof firstVariant === 'object' &&
+        firstVariant?.priceInVND &&
+        typeof firstVariant.priceInVND === 'number'
+      ) {
+        basePrice = firstVariant.priceInVND
+
+        // Check first variant's hot deal price
+        const vHotDeal = (firstVariant as Variant & { hotDealPrice?: number | null }).hotDealPrice
+        if (typeof vHotDeal === 'number' && vHotDeal > 0 && vHotDeal < basePrice) {
+          return {
+            price: vHotDeal,
+            originalPrice: basePrice,
+            isOnSale: true,
+            isHotDeal: true,
+          }
+        }
+      }
     }
   }
 
@@ -117,3 +147,4 @@ export function getEffectivePrice(
     isOnSale: false,
   }
 }
+

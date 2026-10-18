@@ -112,7 +112,7 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
               where: { id: { in: allVariantIds } },
               limit: allVariantIds.length,
               depth: 0,
-              select: { priceInVND: true },
+              select: { priceInVND: true, hotDealPrice: true },
               overrideAccess: true,
               req,
             })
@@ -187,8 +187,15 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
     }
   })
 
+  const variantHotDealPriceMap = new Map<string, number>()
+
   variantsRes.docs.forEach((v) => {
     variantPriceMap.set(String(v.id), (v as any).priceInVND ?? 0)
+    const vHotDeal = (v as any).hotDealPrice
+    const vPrice = (v as any).priceInVND ?? 0
+    if (typeof vHotDeal === 'number' && vHotDeal > 0 && vHotDeal < vPrice) {
+      variantHotDealPriceMap.set(String(v.id), vHotDeal)
+    }
   })
 
   const defaultTaxIds: string[] = []
@@ -271,7 +278,12 @@ export const applyCartDiscounts: CollectionBeforeChangeHook = async ({ data, req
     // Hot Deal takes priority — mutually exclusive with sale events by validation
     if (hotDealPriceMap.has(pid)) return hotDealPriceMap.get(pid)!
     if (salePriceMap.has(pid)) return salePriceMap.get(pid)!
-    if (item.variant) return variantPriceMap.get(extractId(item.variant)) ?? 0
+    if (item.variant) {
+      const vid = extractId(item.variant)
+      // Variant hot deal takes priority over regular variant price
+      if (variantHotDealPriceMap.has(vid)) return variantHotDealPriceMap.get(vid)!
+      return variantPriceMap.get(vid) ?? 0
+    }
     return productPriceMap.get(pid) ?? 0
   }
 

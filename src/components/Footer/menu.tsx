@@ -4,7 +4,7 @@ import { CMSLink } from '@/components/Link'
 import React from 'react'
 
 interface Props {
-  menu: Footer['navItems']
+  menu: any[]
 }
 
 export function FooterMenu({ menu }: Props) {

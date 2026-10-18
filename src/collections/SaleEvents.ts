@@ -59,6 +59,42 @@ export const SaleEvents: CollectionConfig = {
           )
         }
 
+        // Also check if any variant of these products has a hotDealPrice
+        const variantHotDealConflicts = await req.payload.find({
+          collection: 'variants' as any,
+          where: {
+            and: [
+              { product: { in: productIds } },
+              { hotDealPrice: { exists: true } },
+              { hotDealPrice: { greater_than: 0 } },
+            ],
+          },
+          limit: 100,
+          depth: 1,
+          overrideAccess: true,
+          req,
+        })
+
+        if (variantHotDealConflicts.docs.length > 0) {
+          // Get unique product IDs from conflicting variants
+          const conflictingProductIds = new Set(
+            variantHotDealConflicts.docs.map((v: any) =>
+              String(typeof v.product === 'object' && v.product !== null ? v.product.id : v.product),
+            ),
+          )
+          const conflictingProducts = variantHotDealConflicts.docs
+            .filter((v: any) => typeof v.product === 'object' && v.product !== null)
+            .reduce((acc: Map<string, string>, v: any) => {
+              const pid = String(v.product.id)
+              if (!acc.has(pid)) acc.set(pid, v.product.title || pid)
+              return acc
+            }, new Map<string, string>())
+          const titles = Array.from(conflictingProducts.values()).map((t) => `"${t}"`).join(', ')
+          throw new Error(
+            `The following products have variants with Hot Deal prices and cannot be added to a sale event: ${titles}. Remove the variant Hot Deal prices first.`,
+          )
+        }
+
         if (!startsAt || !endsAt) return data
 
         const currentId = operation === 'update' && data.id ? data.id : undefined

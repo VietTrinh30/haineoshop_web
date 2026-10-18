@@ -1,0 +1,132 @@
+<h2>Variant Option Images & Grouping</h2>
+<p class="subtitle">Adding image support to first type's options — fits naturally into inline arrays</p>
+
+<div class="section">
+  <div class="mockup">
+    <div class="mockup-header">Updated variantTypeDefs — with image on options</div>
+    <div class="mockup-body" style="padding: 24px; font-family: monospace; font-size: 13px; line-height: 1.8;">
+      <div style="color: #fff;">
+        <div style="color: #4ecdc4; font-weight: bold;">variantTypeDefs: array [</div>
+        <div style="padding-left: 16px;">
+          <div>id: <span style="color: #888;">string (auto)</span></div>
+          <div>label: <span style="color: #4ecdc4;">text, required</span> <span style="color: #888;">// "loại"</span></div>
+          <div style="color: #4ecdc4; font-weight: bold;">options: array [</div>
+          <div style="padding-left: 16px;">
+            <div>id: <span style="color: #888;">string (auto)</span></div>
+            <div>label: <span style="color: #4ecdc4;">text, required</span> <span style="color: #888;">// "DAY - Có màu"</span></div>
+            <div style="color: #ffd93d;">+ image: upload → media <span style="color: #888;">// optional, for variant display</span></div>
+          </div>
+          <div style="color: #4ecdc4;">]</div>
+        </div>
+        <div style="color: #4ecdc4;">]</div>
+      </div>
+
+      <div style="background: #1a2e1a; border: 1px solid #4ecdc4; border-radius: 8px; padding: 12px; margin-top: 16px; font-family: sans-serif; font-size: 12px;">
+        <div style="color: #4ecdc4; font-weight: bold;">💡 The image field is available on ALL variant type options</div>
+        <div style="color: #ccc; margin-top: 4px;">
+          But typically only the <strong>first</strong> type's options have images (like your screenshot shows "loại" options with images but "size" options without). The image field is optional so admins can leave it empty for types like "size".
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <div class="mockup">
+    <div class="mockup-header">How it looks with your example data</div>
+    <div class="mockup-body" style="padding: 20px;">
+      <!-- Simulated variant table -->
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #1a1a2e; text-align: left;">
+            <th style="padding: 10px 12px; color: #e94560; border-bottom: 2px solid #333;">● loại</th>
+            <th style="padding: 10px 12px; color: #fff; border-bottom: 2px solid #333;">size</th>
+            <th style="padding: 10px 12px; color: #fff; border-bottom: 2px solid #333;">* Giá</th>
+            <th style="padding: 10px 12px; color: #fff; border-bottom: 2px solid #333;">* Kho hàng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- DAY group -->
+          <tr style="border-bottom: 1px solid #222;">
+            <td style="padding: 10px 12px; vertical-align: top;" rowspan="2">
+              <div style="color: #4ecdc4; font-weight: bold;">DAY - Có màu</div>
+              <div style="width: 60px; height: 60px; background: #2a2a3e; border-radius: 8px; margin-top: 8px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 24px;">🌅</span>
+              </div>
+              <div style="color: #888; font-size: 10px; margin-top: 4px;">← option.image</div>
+            </td>
+            <td style="padding: 10px 12px; color: #fff;">M</td>
+            <td style="padding: 10px 12px; color: #888;">₫ ___</td>
+            <td style="padding: 10px 12px; color: #fff;">0</td>
+          </tr>
+          <tr style="border-bottom: 2px solid #333;">
+            <td style="padding: 10px 12px; color: #fff;">L</td>
+            <td style="padding: 10px 12px; color: #888;">₫ ___</td>
+            <td style="padding: 10px 12px; color: #fff;">0</td>
+          </tr>
+          <!-- NIGHT group -->
+          <tr style="border-bottom: 1px solid #222;">
+            <td style="padding: 10px 12px; vertical-align: top;" rowspan="2">
+              <div style="color: #4ecdc4; font-weight: bold;">NIGHT - Ko màu</div>
+              <div style="width: 60px; height: 60px; background: #2a2a3e; border-radius: 8px; margin-top: 8px; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 24px;">🌙</span>
+              </div>
+              <div style="color: #888; font-size: 10px; margin-top: 4px;">← option.image</div>
+            </td>
+            <td style="padding: 10px 12px; color: #fff;">M</td>
+            <td style="padding: 10px 12px; color: #888;">₫ ___</td>
+            <td style="padding: 10px 12px; color: #fff;">0</td>
+          </tr>
+          <tr style="border-bottom: 2px solid #333;">
+            <td style="padding: 10px 12px; color: #fff;">L</td>
+            <td style="padding: 10px 12px; color: #888;">₫ ___</td>
+            <td style="padding: 10px 12px; color: #fff;">0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background: #0f0f23; border-radius: 8px; padding: 12px; margin-top: 16px; font-family: monospace; font-size: 11px; line-height: 1.6;">
+        <div style="color: #ffd93d; font-weight: bold; margin-bottom: 8px; font-family: sans-serif; font-size: 12px;">How grouping works (data perspective)</div>
+        <div style="color: #fff;">
+          <div style="color: #888;">// Variant doc stores options as [{typeId, optionId}, ...]</div>
+          <div style="color: #888;">// First item = first variant type → used for grouping</div>
+          <br/>
+          <div>variant_1.options[<span style="color: #4ecdc4;">0</span>].optionId → <span style="color: #ffd93d;">"o1"</span> (DAY - Có màu)</div>
+          <div>variant_2.options[<span style="color: #4ecdc4;">0</span>].optionId → <span style="color: #ffd93d;">"o1"</span> (DAY - Có màu)</div>
+          <div style="color: #888;">// ↑ same first option = same group</div>
+          <br/>
+          <div>variant_3.options[<span style="color: #4ecdc4;">0</span>].optionId → <span style="color: #ffd93d;">"o2"</span> (NIGHT - Ko màu)</div>
+          <div>variant_4.options[<span style="color: #4ecdc4;">0</span>].optionId → <span style="color: #ffd93d;">"o2"</span> (NIGHT - Ko màu)</div>
+          <div style="color: #888;">// ↑ same first option = same group</div>
+          <br/>
+          <div style="color: #888;">// To get the image: look up product.variantTypeDefs[0].options</div>
+          <div style="color: #888;">// find option where id === variant.options[0].optionId</div>
+          <div style="color: #888;">// → option.image = the group image</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="background: #1a2e1a; border: 2px solid #4ecdc4; border-radius: 12px; padding: 16px;">
+      <div style="color: #4ecdc4; font-weight: bold; font-size: 14px; margin-bottom: 8px;">✅ Does NOT break our approach</div>
+      <ul style="color: #ccc; font-size: 12px; padding-left: 20px;">
+        <li>Image is just another field on the options array</li>
+        <li>Grouping is done by reading <code>variant.options[0].optionId</code></li>
+        <li>No extra collections needed</li>
+        <li>Frontend reads image from product's inline data</li>
+      </ul>
+    </div>
+    <div style="background: #1a1a2e; border: 2px solid #ffd93d; border-radius: 12px; padding: 16px;">
+      <div style="color: #ffd93d; font-weight: bold; font-size: 14px; margin-bottom: 8px;">📝 Gallery still coexists</div>
+      <ul style="color: #ccc; font-size: 12px; padding-left: 20px;">
+        <li>Product gallery = main image carousel</li>
+        <li>Option image = variant group representative</li>
+        <li>Gallery <code>variantOptionId</code> can filter carousel by selected option</li>
+        <li>Both serve different UI purposes</li>
+      </ul>
+    </div>
+  </div>
+</div>

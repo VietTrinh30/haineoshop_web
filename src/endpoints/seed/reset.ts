@@ -18,8 +18,6 @@ const collections: CollectionSlug[] = [
 
   // Ecommerce + checkout data
   'variants',
-  'variantOptions',
-  'variantTypes',
   'carts',
   'transactions',
   'addresses',

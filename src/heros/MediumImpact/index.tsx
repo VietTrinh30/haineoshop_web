@@ -131,10 +131,11 @@ export const MediumImpactHero: React.FC<HeroProps> = (props) => {
                       )
                     })
                   : media &&
-                    typeof media === 'object' && (
+                    typeof media === 'object' &&
+                    'image' in media && (
                       <div className="w-full h-full rounded-[4rem] overflow-hidden shadow-2xl border-4 border-white">
                         <Media
-                          resource={media}
+                          resource={media.image as any}
                           className="w-full h-full"
                           imgClassName="object-cover w-full h-full"
                           priority

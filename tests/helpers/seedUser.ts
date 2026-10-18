@@ -140,8 +140,8 @@ export async function seedTestData(): Promise<{
       inventory: 100,
       _status: 'published',
       gallery: [{ image: media.id }],
-      priceInUSDEnabled: true,
-      priceInUSD: 1000,
+      priceInVNDEnabled: true,
+      priceInVND: 1000,
     },
   })
 
@@ -151,8 +151,8 @@ export async function seedTestData(): Promise<{
     data: {
       product: productWithVariants.id,
       options: [payloadOption.id],
-      priceInUSDEnabled: true,
-      priceInUSD: 1000,
+      priceInVNDEnabled: true,
+      priceInVND: 1000,
       inventory: 50,
       _status: 'published',
     },
@@ -163,8 +163,8 @@ export async function seedTestData(): Promise<{
     data: {
       product: productWithVariants.id,
       options: [figmaOption.id],
-      priceInUSDEnabled: true,
-      priceInUSD: 1000,
+      priceInVNDEnabled: true,
+      priceInVND: 1000,
       inventory: 50,
       _status: 'published',
     },
@@ -179,8 +179,8 @@ export async function seedTestData(): Promise<{
       inventory: 100,
       _status: 'published',
       gallery: [{ image: media.id }],
-      priceInUSDEnabled: true,
-      priceInUSD: 1000,
+      priceInVNDEnabled: true,
+      priceInVND: 1000,
     },
   })
 
@@ -193,8 +193,8 @@ export async function seedTestData(): Promise<{
       inventory: 0,
       _status: 'published',
       gallery: [{ image: media.id }],
-      priceInUSDEnabled: true,
-      priceInUSD: 1000,
+      priceInVNDEnabled: true,
+      priceInVND: 1000,
     },
   })
 

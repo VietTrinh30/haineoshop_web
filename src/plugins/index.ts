@@ -372,6 +372,63 @@ export const plugins: Plugin[] = [
     },
     products: {
       productsCollectionOverride: ProductsCollection,
+      variants: {
+      variantsCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        fields: [
+          ...defaultCollection.fields.map((f) => {
+            if ('name' in f && f.name === 'options') {
+              return {
+                name: 'options',
+                type: 'json',
+                required: true,
+              } as any
+            }
+            if ('name' in f && f.name === 'priceInVNDEnabled') {
+              return {
+                ...f,
+                defaultValue: true,
+                admin: {
+                  ...(f.admin || {}),
+                  hidden: true,
+                },
+              }
+            }
+            return f
+          }),
+          {
+            name: 'hotDealPrice',
+            type: 'number',
+            label: 'Hot Deal Price (VND)',
+            required: false,
+            admin: {
+              description:
+                'Hot Deal price for this variant. When set, displayed as sale price with percent discount.',
+            },
+          },
+        ],
+        hooks: {
+          ...(defaultCollection.hooks || {}),
+          // We override the options to be JSON, so the default hooks which expect relationship IDs will crash.
+          beforeValidate: [],
+          beforeChange: [],
+        },
+      }),
+      variantTypesCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        admin: {
+          ...defaultCollection.admin,
+          hidden: true,
+        },
+      }),
+      variantOptionsCollectionOverride: ({ defaultCollection }) => ({
+        ...defaultCollection,
+        admin: {
+          ...defaultCollection.admin,
+          hidden: true,
+        },
+      }),
+      },
     },
   }),
 ]

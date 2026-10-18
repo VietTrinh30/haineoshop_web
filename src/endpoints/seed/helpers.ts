@@ -16,8 +16,6 @@ export interface SeedContext {
   subcategories: Record<string, SeedEntity & { title: string; slug: string }>
   products: Record<string, SeedEntity & { title: string; slug: string }>
   users: Record<string, SeedEntity & { email: string }>
-  variantTypes: Record<string, SeedEntity>
-  variantOptions: Record<string, SeedEntity & { value: string }>
   forms: Record<string, SeedEntity>
   misc: Record<string, unknown>
 }
@@ -30,8 +28,6 @@ export function createSeedContext(payload: Payload): SeedContext {
     subcategories: {},
     products: {},
     users: {},
-    variantTypes: {},
-    variantOptions: {},
     forms: {},
     misc: {},
   }

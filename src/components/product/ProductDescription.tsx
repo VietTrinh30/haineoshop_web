@@ -26,6 +26,11 @@ export function ProductDescription({
   const priceInfo = getEffectivePrice(product, activeCampaigns)
   const { price: effectivePrice, originalPrice, isOnSale, saleEvent } = priceInfo
 
+  // Track variant hot deal info for display
+  let hasVariantHotDeals = false
+  let lowestHotDeal = 0
+  let highestHotDeal = 0
+
   if (hasVariants) {
     const sorted = (product.variants?.docs ?? [])
       .filter((v): v is Variant => typeof v === 'object' && typeof v.priceInVND === 'number')
@@ -34,6 +39,20 @@ export function ProductDescription({
     if (sorted.length) {
       lowestAmount = sorted[0].priceInVND ?? 0
       highestAmount = sorted[sorted.length - 1].priceInVND ?? 0
+
+      // Check for variant hot deal prices
+      const hotDeals = sorted
+        .filter((v) => {
+          const hd = (v as Variant & { hotDealPrice?: number | null }).hotDealPrice
+          return typeof hd === 'number' && hd > 0 && hd < (v.priceInVND ?? 0)
+        })
+        .map((v) => (v as Variant & { hotDealPrice: number }).hotDealPrice)
+
+      if (hotDeals.length > 0) {
+        hasVariantHotDeals = true
+        lowestHotDeal = Math.min(...hotDeals)
+        highestHotDeal = Math.max(...hotDeals)
+      }
     }
   } else {
     singleAmount = product.priceInVND ?? 0
@@ -64,7 +83,25 @@ export function ProductDescription({
       <div className="rounded-xl bg-primary/10 px-5 py-4 flex flex-col gap-1">
         <div className="flex items-center gap-3 flex-wrap">
           {hasVariants ? (
-            <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
+            hasVariantHotDeals ? (
+              <div className="flex items-center gap-3 flex-wrap">
+                <Price
+                  highestAmount={highestHotDeal}
+                  lowestAmount={lowestHotDeal}
+                  className="text-2xl font-bold text-green-600"
+                />
+                <Price
+                  highestAmount={highestAmount}
+                  lowestAmount={lowestAmount}
+                  className="text-sm text-muted-foreground line-through"
+                />
+                <span className="rounded-lg bg-green-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+                  HOT DEAL
+                </span>
+              </div>
+            ) : (
+              <Price highestAmount={highestAmount} lowestAmount={lowestAmount} />
+            )
           ) : isOnSale && originalPrice != null ? (
             <>
               <SalePrice

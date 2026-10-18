@@ -94,20 +94,21 @@ export function CartModal({ renderTrigger }: CartModalProps) {
                   const isVariant = Boolean(variant) && typeof variant === 'object'
 
                   if (isVariant) {
-                    price = variant?.priceInVND || 0
+                    const variantHotDeal = (variant as any)?.hotDealPrice
+                    if (typeof variantHotDeal === 'number' && variantHotDeal > 0 && variantHotDeal < (variant?.priceInVND || 0)) {
+                      price = variantHotDeal
+                    } else {
+                      price = variant?.priceInVND || 0
+                    }
 
                     const imageVariant = product.gallery?.find(
                       (galleryItem: NonNullable<Product['gallery']>[number]) => {
-                        if (!galleryItem.variantOption) return false
-                        const variantOptionID =
-                          typeof galleryItem.variantOption === 'object'
-                            ? galleryItem.variantOption.id
-                            : galleryItem.variantOption
-
-                        const hasMatch = variant?.options?.some(
-                          (option: number | VariantOption) => {
-                            if (typeof option === 'object') return option.id === variantOptionID
-                            else return option === variantOptionID
+                        if (!galleryItem.variantOptionId) return false
+                        
+                        const optionsArray = variant?.options as any[] | undefined
+                        const hasMatch = optionsArray?.some(
+                          (option: any) => {
+                            return option.optionId === galleryItem.variantOptionId
                           },
                         )
 
@@ -146,11 +147,9 @@ export function CartModal({ renderTrigger }: CartModalProps) {
                             <span className="leading-tight">{product?.title}</span>
                             {isVariant && variant ? (
                               <p className="text-sm text-neutral-500 dark:text-neutral-400 capitalize">
-                                {variant.options
-                                  ?.map((option: number | VariantOption) => {
-                                    if (typeof option === 'object') return option.label
-                                    return null
-                                  })
+                                {(variant.options as any[])
+                                  ?.map((option: any) => option.label)
+                                  .filter(Boolean)
                                   .join(', ')}
                               </p>
                             ) : null}

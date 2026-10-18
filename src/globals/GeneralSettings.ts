@@ -34,9 +34,14 @@ export const GeneralSettings: GlobalConfig = {
   },
   hooks: {
     afterChange: [
-      async () => {
-        const { revalidateTag } = await import('next/cache')
-        revalidateTag('global_general-settings')
+      async ({ req }) => {
+        if (req.context?.disableRevalidate) return
+        try {
+          const { revalidateTag } = await import('next/cache')
+          revalidateTag('global_general-settings')
+        } catch (err) {
+          // ignore error when not running in Next.js
+        }
       },
     ],
   },

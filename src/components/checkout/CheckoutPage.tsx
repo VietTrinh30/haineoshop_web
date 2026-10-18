@@ -585,20 +585,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               const isVariant = Boolean(variant) && typeof variant === 'object'
 
               if (isVariant) {
-                priceMinor = variant?.priceInVND || 0
+                const variantHotDeal = (variant as any)?.hotDealPrice
+                if (typeof variantHotDeal === 'number' && variantHotDeal > 0 && variantHotDeal < (variant?.priceInVND || 0)) {
+                  priceMinor = variantHotDeal
+                } else {
+                  priceMinor = variant?.priceInVND || 0
+                }
 
                 const imageVariant = product.gallery?.find(
-                  (item: { variantOption?: string | number | { id: string | number } }) => {
-                    if (!item.variantOption) return false
-                    const variantOptionID =
-                      typeof item.variantOption === 'object'
-                        ? item.variantOption.id
-                        : item.variantOption
-
+                  (item: any) => {
+                    if (!item.variantOptionId) return false
+                    
                     const hasMatch = variant?.options?.some(
-                      (option: string | number | { id: string | number }) => {
-                        if (typeof option === 'object') return option.id === variantOptionID
-                        else return option === variantOptionID
+                      (option: any) => {
+                        return option.optionId === item.variantOptionId
                       },
                     )
 
@@ -626,14 +626,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                       {variant && typeof variant === 'object' && (
                         <p className="text-sm font-mono text-primary/50 tracking-widest">
                           {variant.options
-                            ?.map(
-                              (
-                                option: string | number | { label?: string; id?: string | number },
-                              ) => {
-                                if (typeof option === 'object') return option.label
-                                return null
-                              },
-                            )
+                            ?.map((option: any) => option.label)
+                            .filter(Boolean)
                             .join(', ')}
                         </p>
                       )}

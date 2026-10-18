@@ -34,15 +34,9 @@ export const Gallery: React.FC<Props> = ({ gallery, video }) => {
 
     if (values && api) {
       const index = gallery.findIndex((item) => {
-        if (!item.variantOption) return false
+        if (!item.variantOptionId) return false
 
-        let variantID: DefaultDocumentIDType
-
-        if (typeof item.variantOption === 'object') {
-          variantID = item.variantOption.id
-        } else variantID = item.variantOption
-
-        return Boolean(values.find((value) => value === String(variantID)))
+        return Boolean(values.find((value) => value === item.variantOptionId))
       })
       if (index !== -1) {
         const adjustedIndex = index + videoOffset
